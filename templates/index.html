@@ -1111,7 +1111,7 @@
                     <div><div class="name">Sarah Kaur</div><div class="role">Angel Investor</div></div>
                 </div>
                 <div class="stars">★★★★★</div>
-                <div class="quote">“The platform is intuitive. I love the live data and the clean interface.”</div>
+                <div class="quote">"The platform is intuitive. I love the live data and the clean interface."</div>
                 <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
             </div>
             <div class="testimonial-card">
@@ -1120,7 +1120,7 @@
                     <div><div class="name">David Roth</div><div class="role">Tech Founder</div></div>
                 </div>
                 <div class="stars">★★★★★</div>
-                <div class="quote">“Transparent fees and great execution. I’ve recommended it to my entire network.”</div>
+                <div class="quote">"Transparent fees and great execution. I've recommended it to my entire network."</div>
                 <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
             </div>
             <div class="testimonial-card">
@@ -1129,7 +1129,7 @@
                     <div><div class="name">Elena Marchetti</div><div class="role">Portfolio Manager</div></div>
                 </div>
                 <div class="stars">★★★★★</div>
-                <div class="quote">“A beautiful dashboard with real depth. The risk tools are exactly what I need.”</div>
+                <div class="quote">"A beautiful dashboard with real depth. The risk tools are exactly what I need."</div>
                 <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
             </div>
             <div class="testimonial-card">
@@ -1138,7 +1138,7 @@
                     <div><div class="name">James Okafor</div><div class="role">Financial Advisor</div></div>
                 </div>
                 <div class="stars">★★★★★</div>
-                <div class="quote">“My clients love the clarity. It’s become an essential part of my advisory workflow.”</div>
+                <div class="quote">"My clients love the clarity. It's become an essential part of my advisory workflow."</div>
                 <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
             </div>
         </div>
@@ -1272,10 +1272,19 @@
             });
 
             // ============================================================
-            // DEMO USERS
+            // DEMO USERS - Fixed storage
             // ============================================================
-            function getUsers() { const data = localStorage.getItem('investdesk_users'); return data ? JSON.parse(data) : []; }
-            function saveUsers(users) { localStorage.setItem('investdesk_users', JSON.stringify(users)); }
+            function getUsers() { 
+                try {
+                    const data = localStorage.getItem('investdesk_users'); 
+                    return data ? JSON.parse(data) : []; 
+                } catch(e) { return []; }
+            }
+            function saveUsers(users) { 
+                localStorage.setItem('investdesk_users', JSON.stringify(users)); 
+            }
+            
+            // Initialize with demo users if empty
             if (getUsers().length === 0) {
                 saveUsers([
                     { name: 'Demo User', email: 'demo@investdesk.com', password: 'demo123' },
@@ -1284,42 +1293,64 @@
             }
 
             // ============================================================
-            // LOGIN
+            // LOGIN - Fixed to work properly
             // ============================================================
             const loginForm = document.getElementById('loginForm');
             const loginEmail = document.getElementById('loginEmail');
             const loginPassword = document.getElementById('loginPassword');
             const loginEmailErr = document.getElementById('loginEmailError');
             const loginPassErr = document.getElementById('loginPasswordError');
+            
+            // Pre-fill demo credentials
             loginEmail.value = 'demo@investdesk.com';
             loginPassword.value = 'demo123';
+            
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
                 const email = loginEmail.value.trim();
                 const password = loginPassword.value.trim();
                 const emailOk = validateEmail(email);
                 const passOk = password.length > 0;
+                
+                // Validate inputs
                 setFieldError(loginEmail, loginEmailErr, !emailOk);
                 setFieldError(loginPassword, loginPassErr, !passOk);
-                if (!emailOk || !passOk) { showToast('Please fix the errors.', 'error'); return; }
+                
+                if (!emailOk || !passOk) {
+                    showToast('Please fix the errors.', 'error');
+                    return;
+                }
+                
+                // Show loading state
                 const btn = document.getElementById('loginBtn');
-                btn.disabled = true; btn.textContent = 'Signing in…';
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Signing in…';
+                
+                // Simulate network delay
                 setTimeout(() => {
-                    btn.disabled = false; btn.textContent = 'Sign In';
                     const users = getUsers();
                     const user = users.find(u => u.email === email && u.password === password);
+                    
                     if (user) {
-                        showToast('Welcome back, ' + user.name + '!', 'success');
+                        showToast('✅ Welcome back, ' + user.name + '!', 'success');
                         sessionStorage.setItem('investdesk_user', JSON.stringify(user));
-                        setTimeout(() => window.location.href = '/dashboard', 600);
+                        
+                        // Redirect to dashboard after brief delay
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 600);
                     } else {
-                        showToast('Invalid email or password. Try demo@investdesk.com / demo123', 'error');
+                        showToast('❌ Invalid email or password. Try demo@investdesk.com / demo123', 'error');
+                        btn.disabled = false;
+                        btn.textContent = originalText;
                     }
                 }, 800);
             });
 
             // ============================================================
-            // REGISTER
+            // REGISTER - Fixed to work properly
             // ============================================================
             const regForm = document.getElementById('registerFormEl');
             const regName = document.getElementById('regName');
@@ -1330,36 +1361,65 @@
             const regEmailExistsErr = document.getElementById('regEmailExistsError');
             const regPassErr = document.getElementById('regPasswordError');
             const regConfirmErr = document.getElementById('regConfirmError');
+            
             regForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
                 const name = regName.value.trim();
                 const email = regEmail.value.trim();
                 const password = regPassword.value.trim();
                 const confirm = regConfirm.value.trim();
+                
                 const nameOk = name.length > 0;
                 const emailOk = validateEmail(email);
                 const passOk = password.length >= 6;
                 const confirmOk = password === confirm && passOk;
+                
+                // Check if email exists
                 const users = getUsers();
                 const emailExists = users.some(u => u.email === email);
+                
+                // Validate all fields
                 setFieldError(regName, regNameErr, !nameOk);
                 setFieldError(regEmail, regEmailErr, !emailOk);
                 setFieldError(regPassword, regPassErr, !passOk);
                 setFieldError(regConfirm, regConfirmErr, !confirmOk);
-                if (emailOk && emailExists) { regEmail.classList.add('error'); regEmailExistsErr.style.display = 'block'; } 
-                else { regEmailExistsErr.style.display = 'none'; }
-                if (!nameOk || !emailOk || !passOk || !confirmOk || emailExists) {
-                    showToast('Please fix the errors.', 'error'); return;
+                
+                // Email exists validation
+                if (emailOk && emailExists) {
+                    regEmail.classList.add('error');
+                    regEmailExistsErr.style.display = 'block';
+                } else {
+                    regEmailExistsErr.style.display = 'none';
                 }
+                
+                // Check if any errors
+                if (!nameOk || !emailOk || !passOk || !confirmOk || emailExists) {
+                    showToast('Please fix the errors.', 'error');
+                    return;
+                }
+                
+                // Show loading state
                 const btn = document.getElementById('registerBtn');
-                btn.disabled = true; btn.textContent = 'Creating…';
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Creating…';
+                
+                // Simulate network delay
                 setTimeout(() => {
-                    btn.disabled = false; btn.textContent = 'Create Account';
                     const newUser = { name, email, password };
-                    users.push(newUser); saveUsers(users);
+                    const updatedUsers = getUsers();
+                    updatedUsers.push(newUser);
+                    saveUsers(updatedUsers);
+                    
+                    // Store session
                     sessionStorage.setItem('investdesk_user', JSON.stringify(newUser));
-                    showToast('Account created! Welcome ' + name, 'success');
-                    setTimeout(() => window.location.href = '/dashboard', 700);
+                    showToast('✅ Account created! Welcome ' + name, 'success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 700);
                 }, 900);
             });
 
@@ -1451,7 +1511,7 @@
                 changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
             });
 
-            // Update every 2 seconds
+            // Update charts every 2 seconds
             setInterval(() => {
                 chartConfigs.forEach(cfg => {
                     const chart = charts[cfg.id];
@@ -1475,15 +1535,10 @@
             }, 2000);
 
             // ============================================================
-            // WHATSAPP BUTTON - already a direct link
-            // ============================================================
-            // The WhatsApp button is already an <a> tag with href to wa.me
-
-            // ============================================================
-            // SESSION CHECK
+            // SESSION CHECK - Redirect if already logged in
             // ============================================================
             const existingUser = sessionStorage.getItem('investdesk_user');
-            if (existingUser && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/')) {
+            if (existingUser && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
                 window.location.href = '/dashboard';
             }
         })();
