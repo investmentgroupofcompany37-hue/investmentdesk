@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InvestDesk · Admin · 4 Stocks</title>
+  <title>InvestDesk · Admin · Full CRUD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -497,15 +497,7 @@
   <div class="hidden" id="adminShell">
     <div class="admin-wrapper">
       <div class="ticker-tape">
-        <div class="ticker-track" id="tickerTrack">
-          <div class="ticker-item"><span class="sym">TSLA</span> $243.50 <span class="change-up">▲ 1.2%</span></div>
-          <div class="ticker-item"><span class="sym">AAPL</span> $178.20 <span class="change-up">▲ 0.6%</span></div>
-          <div class="ticker-item"><span class="sym">NVDA</span> $875.40 <span class="change-up">▲ 2.4%</span></div>
-          <div class="ticker-item"><span class="sym">MSFT</span> $415.10 <span class="change-down">▼ 0.2%</span></div>
-          <div class="ticker-item"><span class="sym">VNQ</span> $89.70 <span class="change-up">▲ 0.3%</span></div>
-          <div class="ticker-item"><span class="sym">BTC</span> $62,450 <span class="change-up">▲ 1.8%</span></div>
-          <div class="ticker-item"><span class="sym">ETH</span> $3,210 <span class="change-up">▲ 0.9%</span></div>
-        </div>
+        <div class="ticker-track" id="tickerTrack"></div>
       </div>
 
       <div class="shell">
@@ -515,7 +507,7 @@
               <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
               INVESTDESK
             </div>
-            <div class="sub">Admin · 4 stocks</div>
+            <div class="sub">Admin · Full CRUD</div>
           </div>
           <nav class="rail-nav">
             <a class="rail-link" href="/dashboard">
@@ -536,7 +528,7 @@
           <div class="main-header">
             <h1>
               <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
-              <span class="live-dot"></span> 4 stocks · TSLA, AAPL, NVDA, MSFT
+              <span class="live-dot"></span> Admin Panel
             </h1>
             <div class="meta">Create · Edit · Delete</div>
           </div>
@@ -549,7 +541,7 @@
 
           <div class="panel">
             <div class="panel-head">
-              <h2>Holdings (only TSLA, AAPL, NVDA, MSFT)</h2>
+              <h2>All Holdings</h2>
               <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
                 <button class="btn btn-sm btn-success" id="createBtn">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -564,7 +556,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>ID</th><th>User</th><th>Symbol</th><th>Shares</th><th>Buy price</th><th>Current</th><th>Gain / loss</th>
+                  <th>ID</th><th>User</th><th>Email</th><th>Symbol</th><th>Shares</th><th>Buy price</th><th>Current</th><th>Gain / loss</th>
                   <th style="min-width:130px;">Actions</th>
                 </tr>
               </thead>
@@ -572,7 +564,7 @@
             </table>
             <div class="empty-state" id="adminEmpty">
               <div class="icon">◌</div>
-              No records for the 4 stocks. Click <strong>New</strong> to add one.
+              No records found. Click <strong>New</strong> to add one.
             </div>
           </div>
         </main>
@@ -590,11 +582,15 @@
       <form id="editForm">
         <input type="hidden" id="editId" />
         <div class="field">
-          <label for="editUserName">User</label>
+          <label for="editUserName">User Name *</label>
           <input type="text" id="editUserName" required />
         </div>
         <div class="field">
-          <label for="editSymbol">Symbol (only 4 stocks)</label>
+          <label for="editEmail">Email</label>
+          <input type="email" id="editEmail" />
+        </div>
+        <div class="field">
+          <label for="editSymbol">Symbol *</label>
           <select id="editSymbol" required>
             <option value="TSLA">TSLA — Tesla</option>
             <option value="AAPL">AAPL — Apple</option>
@@ -603,11 +599,11 @@
           </select>
         </div>
         <div class="field">
-          <label for="editShares">Shares</label>
+          <label for="editShares">Shares *</label>
           <input type="number" id="editShares" step="0.0001" min="0.0001" required />
         </div>
         <div class="field">
-          <label for="editBuyPrice">Buy price (per share, $)</label>
+          <label for="editBuyPrice">Buy Price ($) *</label>
           <input type="number" id="editBuyPrice" step="0.01" min="0.01" required />
         </div>
         <div class="modal-actions">
@@ -620,9 +616,13 @@
 
   <script>
     (function() {
-      // ----- toast -----
+      const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
+      let allInvestments = [];
+
+      // ----- Toast -----
       const toast = document.getElementById('toast');
       let toastTimer = null;
+
       function showToast(msg, type = 'success') {
         if (toastTimer) clearTimeout(toastTimer);
         toast.textContent = msg;
@@ -630,7 +630,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
-      // ----- auth -----
+      // ----- Auth -----
       const loginShell = document.getElementById('loginShell');
       const adminShell = document.getElementById('adminShell');
       const loginError = document.getElementById('loginError');
@@ -645,7 +645,8 @@
           if (data.is_admin) {
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
-            loadAdminData();
+            await loadAdminData();
+            await updateTicker();
           } else {
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
@@ -678,7 +679,8 @@
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
             showToast('Welcome, Admin!', 'success');
-            loadAdminData();
+            await loadAdminData();
+            await updateTicker();
           } else {
             loginError.textContent = data.error || 'Invalid username or password.';
             loginError.classList.add('show');
@@ -696,22 +698,27 @@
         showToast('Signed out.', 'success');
       });
 
-      // ----- data loading (filter only 4 stocks) -----
-      const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
+      // ----- Data Loading -----
+      async function fetchPrices() {
+        try {
+          const res = await fetch('/api/prices');
+          const data = await res.json();
+          return data.prices || {};
+        } catch (e) {
+          console.error('Failed to fetch prices:', e);
+          return {};
+        }
+      }
 
       async function loadAdminData() {
         try {
           const invRes = await fetch('/api/admin/investments');
           if (!invRes.ok) throw new Error('Failed to fetch investments');
-          let investments = await invRes.json();
-          // filter to only the 4 stocks
-          investments = investments.filter(inv => ALLOWED_SYMBOLS.includes(inv.symbol));
-
-          const priceRes = await fetch('/api/prices');
-          const priceData = await priceRes.json();
-          const prices = priceData.prices || {};
-          renderAdminTable(investments, prices);
-          updateStats(investments, prices);
+          allInvestments = await invRes.json();
+          
+          const prices = await fetchPrices();
+          renderAdminTable(allInvestments, prices);
+          updateStats(allInvestments, prices);
         } catch (e) {
           showToast('Failed to load data. Please refresh.', 'error');
         }
@@ -741,6 +748,7 @@
             <tr data-id="${inv.id}">
               <td>${inv.id}</td>
               <td>${escapeHtml(inv.user_name)}</td>
+              <td>${escapeHtml(inv.email || '—')}</td>
               <td><strong>${inv.symbol}</strong></td>
               <td>${inv.shares}</td>
               <td>$${inv.buy_price.toFixed(2)}</td>
@@ -756,7 +764,7 @@
                     <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     Delete
                   </button>
-                  <button class="btn-icon create" data-id="${inv.id}" title="Create similar (only 4 stocks)">
+                  <button class="btn-icon create" data-id="${inv.id}" title="Create similar">
                     <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     Copy
                   </button>
@@ -767,7 +775,7 @@
         });
         tbody.innerHTML = html;
 
-        // attach events
+        // Attach events
         tbody.querySelectorAll('.btn-icon.edit').forEach(btn => {
           btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
@@ -806,10 +814,31 @@
         document.getElementById('statTotalValue').textContent = '$' + totalValue.toFixed(2);
       }
 
-      // ----- modal -----
+      async function updateTicker() {
+        const prices = await fetchPrices();
+        const track = document.getElementById('tickerTrack');
+        let html = '';
+        
+        Object.entries(prices).forEach(([symbol, data]) => {
+          const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
+          const arrow = data.change_pct >= 0 ? '▲' : '▼';
+          html += `
+            <div class="ticker-item">
+              <span class="sym">${symbol}</span> 
+              $${data.price ? data.price.toFixed(2) : 'N/A'} 
+              <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
+            </div>
+          `;
+        });
+        
+        track.innerHTML = html + html;
+      }
+
+      // ----- Modal -----
       const editOverlay = document.getElementById('editModalOverlay');
       const editId = document.getElementById('editId');
       const editUserName = document.getElementById('editUserName');
+      const editEmail = document.getElementById('editEmail');
       const editSymbol = document.getElementById('editSymbol');
       const editShares = document.getElementById('editShares');
       const editBuyPrice = document.getElementById('editBuyPrice');
@@ -822,23 +851,20 @@
       function openEditModal(inv, mode = 'edit') {
         currentMode = mode;
         if (mode === 'create') {
-          modalTitleText.textContent = 'Create new (4 stocks only)';
+          modalTitleText.textContent = 'Create New Investment';
           modalSubmitBtn.textContent = 'Create';
           editId.value = '';
           editUserName.value = inv.user_name || '';
-          // ensure symbol is one of the 4
-          if (ALLOWED_SYMBOLS.includes(inv.symbol)) {
-            editSymbol.value = inv.symbol;
-          } else {
-            editSymbol.value = 'TSLA';
-          }
+          editEmail.value = inv.email || '';
+          editSymbol.value = inv.symbol || 'TSLA';
           editShares.value = inv.shares || 1;
           editBuyPrice.value = inv.buy_price || 100;
         } else {
-          modalTitleText.textContent = 'Edit investment';
-          modalSubmitBtn.textContent = 'Save changes';
+          modalTitleText.textContent = 'Edit Investment';
+          modalSubmitBtn.textContent = 'Save Changes';
           editId.value = inv.id;
           editUserName.value = inv.user_name;
+          editEmail.value = inv.email || '';
           editSymbol.value = inv.symbol;
           editShares.value = inv.shares;
           editBuyPrice.value = inv.buy_price;
@@ -847,9 +873,10 @@
       }
 
       cancelEdit.addEventListener('click', () => editOverlay.classList.add('hidden'));
-      editOverlay.addEventListener('click', (e) => { if (e.target === editOverlay) editOverlay.classList.add('hidden'); });
+      editOverlay.addEventListener('click', (e) => { 
+        if (e.target === editOverlay) editOverlay.classList.add('hidden'); 
+      });
 
-      // submit (create / edit) – enforce 4 stocks
       document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const symbol = editSymbol.value;
@@ -859,6 +886,7 @@
         }
         const payload = {
           user_name: editUserName.value.trim(),
+          email: editEmail.value.trim(),
           symbol: symbol,
           shares: parseFloat(editShares.value),
           buy_price: parseFloat(editBuyPrice.value)
@@ -887,13 +915,14 @@
           }
           editOverlay.classList.add('hidden');
           showToast(currentMode === 'create' ? 'Investment created!' : 'Investment updated!', 'success');
-          loadAdminData();
+          await loadAdminData();
+          await updateTicker();
         } catch (e) {
           showToast(e.message || 'Error.', 'error');
         }
       });
 
-      // delete
+      // ----- Delete -----
       async function deleteInvestment(id) {
         try {
           const res = await fetch(`/api/admin/investments/${id}`, { method: 'DELETE' });
@@ -902,34 +931,46 @@
             throw new Error(err.error || 'Delete failed');
           }
           showToast('Investment deleted.', 'success');
-          loadAdminData();
+          await loadAdminData();
+          await updateTicker();
         } catch (e) {
           showToast(e.message || 'Error deleting.', 'error');
         }
       }
 
-      // create new (blank)
+      // ----- Create New (blank) -----
       document.getElementById('createBtn').addEventListener('click', function() {
-        const blank = { user_name: '', symbol: 'TSLA', shares: 1, buy_price: 100 };
+        const blank = { user_name: '', email: '', symbol: 'TSLA', shares: 1, buy_price: 100 };
         openEditModal(blank, 'create');
       });
 
-      // refresh
-      document.getElementById('refreshBtn').addEventListener('click', function() {
-        loadAdminData();
-        showToast('Refreshing...', 'success');
+      // ----- Refresh -----
+      document.getElementById('refreshBtn').addEventListener('click', async function() {
+        await loadAdminData();
+        await updateTicker();
+        showToast('Refreshed!', 'success');
       });
 
+      // ----- Helpers -----
       function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
       }
 
-      // init
+      // ----- Init -----
       loginUsername.value = 'admin';
       loginPassword.value = 'admin123';
       checkAdminSession();
+
+      // Auto-refresh every 30 seconds
+      setInterval(async () => {
+        if (!adminShell.classList.contains('hidden')) {
+          await loadAdminData();
+          await updateTicker();
+        }
+      }, 30000);
     })();
   </script>
 </body>
