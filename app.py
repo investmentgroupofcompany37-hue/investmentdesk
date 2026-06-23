@@ -15,6 +15,7 @@ import time
 import threading
 from datetime import datetime
 from functools import wraps
+import json
 
 from flask import Flask, jsonify, request, session, send_from_directory, g
 from flask_cors import CORS
@@ -156,6 +157,21 @@ def admin_required(fn):
 
 
 # ---------------------------------------------------------------------------
+# Helper to safely parse JSON
+# ---------------------------------------------------------------------------
+
+def safe_get_json():
+    """Safely parse JSON from request body with error handling."""
+    try:
+        if request.data:
+            return request.get_json(force=True) or {}
+        return {}
+    except Exception as e:
+        # If JSON parsing fails, return an empty dict with error info
+        return {"_json_error": str(e)}
+
+
+# ---------------------------------------------------------------------------
 # Routes — static frontend
 # ---------------------------------------------------------------------------
 
@@ -216,7 +232,11 @@ def list_investments():
 @app.route("/api/investments", methods=["POST"])
 def create_investment():
     """User creates an investment (dashboard only)"""
-    payload = request.get_json(force=True) or {}
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
     user_name = (payload.get("user_name") or "").strip()
     email = (payload.get("email") or "").strip()
     symbol = (payload.get("symbol") or "").strip().upper()
@@ -248,7 +268,11 @@ def create_investment():
 
 @app.route("/api/admin/login", methods=["POST"])
 def admin_login():
-    payload = request.get_json(force=True) or {}
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
     username = payload.get("username", "")
     password = payload.get("password", "")
     if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
@@ -284,7 +308,11 @@ def admin_list_investments():
 @admin_required
 def admin_create_investment():
     """Admin creates a new investment record"""
-    payload = request.get_json(force=True) or {}
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
     user_name = (payload.get("user_name") or "").strip()
     email = (payload.get("email") or "").strip()
     symbol = (payload.get("symbol") or "").strip().upper()
@@ -313,7 +341,11 @@ def admin_create_investment():
 @app.route("/api/admin/investments/<int:investment_id>", methods=["PUT"])
 @admin_required
 def admin_update_investment(investment_id):
-    payload = request.get_json(force=True) or {}
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
     db = get_db()
     existing = db.execute("SELECT * FROM investments WHERE id = ?", (investment_id,)).fetchone()
     if not existing:
@@ -353,6 +385,25 @@ def admin_delete_investment(investment_id):
     db.execute("DELETE FROM investments WHERE id = ?", (investment_id,))
     db.commit()
     return jsonify({"ok": True, "deleted_id": investment_id})
+
+
+# ---------------------------------------------------------------------------
+# Error handlers
+# ---------------------------------------------------------------------------
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"error": "Resource not found"}), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({"error": "Internal server error"}), 500
+
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"error": "Bad request"}), 400
 
 
 # ---------------------------------------------------------------------------
