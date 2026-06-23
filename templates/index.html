@@ -895,7 +895,6 @@
                 loginNavBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Switch to sign in tab
                     document.querySelector('.tab-btn[data-tab="signin"]').click();
                 });
             }
@@ -904,12 +903,13 @@
                 getStartedBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Switch to register tab
                     document.querySelector('.tab-btn[data-tab="register"]').click();
                 });
             }
 
-            // Tabs
+            // ============================================================
+            // TABS
+            // ============================================================
             const tabBtns = document.querySelectorAll('.tab-btn');
             const forms = {
                 signin: document.getElementById('signinForm'),
@@ -931,7 +931,9 @@
                 });
             });
 
-            // Helpers
+            // ============================================================
+            // HELPERS
+            // ============================================================
             function setFieldError(input, errEl, condition) {
                 if (condition) {
                     input.classList.add('error');
@@ -952,7 +954,9 @@
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
 
-            // Password strength
+            // ============================================================
+            // PASSWORD STRENGTH
+            // ============================================================
             const regPassword = document.getElementById('regPassword');
             const strengthFill = document.getElementById('strengthFill');
             const strengthText = document.getElementById('strengthText');
@@ -1113,7 +1117,9 @@
                 }, 900);
             });
 
-            // Real-time validation
+            // ============================================================
+            // REAL-TIME VALIDATION
+            // ============================================================
             regName.addEventListener('blur', function() {
                 const ok = this.value.trim().length > 0;
                 setFieldError(this, regNameErr, !ok);
