@@ -34,19 +34,17 @@ DB_PATH = "dashboard.db"
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
 
-# Real estate has no single stock ticker, so we proxy it with VNQ
-# (Vanguard Real Estate ETF) — a widely used real-estate market proxy.
+# Only 4 stocks allowed
 TICKERS = {
     "TSLA": "Tesla",
     "AAPL": "Apple",
     "NVDA": "NVIDIA",
     "MSFT": "Microsoft",
-    "VNQ": "Real Estate (VNQ ETF)",
 }
 
 PRICE_CACHE = {}
 PRICE_CACHE_LOCK = threading.Lock()
-CACHE_TTL_SECONDS = 15  # refetch from yfinance at most every 15s per symbol
+CACHE_TTL_SECONDS = 15
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = "dev-secret-key-change-in-production"
@@ -85,13 +83,18 @@ def init_db():
         )
         """
     )
+    # Check if email column exists, add if not
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(investments)")
+    columns = [col[1] for col in cursor.fetchall()]
+    if "email" not in columns:
+        cursor.execute("ALTER TABLE investments ADD COLUMN email TEXT")
     conn.commit()
     conn.close()
 
 
 # ---------------------------------------------------------------------------
-# Live price fetching (yfinance), with a small in-memory cache so we don't
-# hammer Yahoo Finance on every browser poll.
+# Live price fetching
 # ---------------------------------------------------------------------------
 
 def fetch_price(symbol):
@@ -109,13 +112,11 @@ def fetch_price(symbol):
 
     try:
         ticker = yf.Ticker(symbol)
-        # fast_info is the lightweight, low-latency path in yfinance
         info = ticker.fast_info
         price = info.get("lastPrice") or info.get("last_price")
         prev_close = info.get("previousClose") or info.get("previous_close")
 
         if price is None:
-            # fallback: 1-day history
             hist = ticker.history(period="2d")
             if not hist.empty:
                 price = float(hist["Close"].iloc[-1])
@@ -160,19 +161,16 @@ def admin_required(fn):
 
 @app.route("/")
 def index():
-    """Serve the landing page (index.html)"""
     return send_from_directory("templates", "index.html")
 
 
 @app.route("/dashboard")
 def dashboard():
-    """Serve the main dashboard (dashboard.html)"""
     return send_from_directory("templates", "dashboard.html")
 
 
 @app.route("/admin")
 def admin_page():
-    """Serve the admin panel (admin.html)"""
     return send_from_directory("templates", "admin.html")
 
 
@@ -217,13 +215,15 @@ def list_investments():
 
 @app.route("/api/investments", methods=["POST"])
 def create_investment():
+    """User creates an investment (dashboard only)"""
     payload = request.get_json(force=True) or {}
     user_name = (payload.get("user_name") or "").strip()
+    email = (payload.get("email") or "").strip()
     symbol = (payload.get("symbol") or "").strip().upper()
     shares = payload.get("shares")
     buy_price = payload.get("buy_price")
 
-    if not user_name or symbol not in TICKERS or not shares or not buy_price:
+    if not user_name or symbol not in TICKERS or shares is None or buy_price is None:
         return jsonify({"error": "user_name, valid symbol, shares, and buy_price are required"}), 400
 
     try:
@@ -234,8 +234,8 @@ def create_investment():
 
     db = get_db()
     cur = db.execute(
-        "INSERT INTO investments (user_name, symbol, shares, buy_price, created_at) VALUES (?, ?, ?, ?, ?)",
-        (user_name, symbol, shares, buy_price, datetime.utcnow().isoformat()),
+        "INSERT INTO investments (user_name, email, symbol, shares, buy_price, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_name, email, symbol, shares, buy_price, datetime.utcnow().isoformat()),
     )
     db.commit()
     new_row = db.execute("SELECT * FROM investments WHERE id = ?", (cur.lastrowid,)).fetchone()
@@ -269,7 +269,7 @@ def admin_session():
 
 
 # ---------------------------------------------------------------------------
-# Routes — admin CRUD on investments (edit / delete any user's record)
+# Routes — admin CRUD on investments (full control)
 # ---------------------------------------------------------------------------
 
 @app.route("/api/admin/investments", methods=["GET"])
@@ -278,6 +278,36 @@ def admin_list_investments():
     db = get_db()
     rows = db.execute("SELECT * FROM investments ORDER BY created_at DESC").fetchall()
     return jsonify([dict(r) for r in rows])
+
+
+@app.route("/api/admin/investments", methods=["POST"])
+@admin_required
+def admin_create_investment():
+    """Admin creates a new investment record"""
+    payload = request.get_json(force=True) or {}
+    user_name = (payload.get("user_name") or "").strip()
+    email = (payload.get("email") or "").strip()
+    symbol = (payload.get("symbol") or "").strip().upper()
+    shares = payload.get("shares")
+    buy_price = payload.get("buy_price")
+
+    if not user_name or symbol not in TICKERS or shares is None or buy_price is None:
+        return jsonify({"error": "user_name, symbol, shares, and buy_price are required"}), 400
+
+    try:
+        shares = float(shares)
+        buy_price = float(buy_price)
+    except (TypeError, ValueError):
+        return jsonify({"error": "shares and buy_price must be numbers"}), 400
+
+    db = get_db()
+    cur = db.execute(
+        "INSERT INTO investments (user_name, email, symbol, shares, buy_price, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_name, email, symbol, shares, buy_price, datetime.utcnow().isoformat()),
+    )
+    db.commit()
+    new_row = db.execute("SELECT * FROM investments WHERE id = ?", (cur.lastrowid,)).fetchone()
+    return jsonify(dict(new_row)), 201
 
 
 @app.route("/api/admin/investments/<int:investment_id>", methods=["PUT"])
@@ -290,6 +320,7 @@ def admin_update_investment(investment_id):
         return jsonify({"error": "Investment not found"}), 404
 
     user_name = payload.get("user_name", existing["user_name"])
+    email = payload.get("email", existing.get("email", ""))
     symbol = (payload.get("symbol", existing["symbol"]) or "").upper()
     shares = payload.get("shares", existing["shares"])
     buy_price = payload.get("buy_price", existing["buy_price"])
@@ -304,8 +335,8 @@ def admin_update_investment(investment_id):
         return jsonify({"error": "shares and buy_price must be numbers"}), 400
 
     db.execute(
-        "UPDATE investments SET user_name = ?, symbol = ?, shares = ?, buy_price = ? WHERE id = ?",
-        (user_name, symbol, shares, buy_price, investment_id),
+        "UPDATE investments SET user_name = ?, email = ?, symbol = ?, shares = ?, buy_price = ? WHERE id = ?",
+        (user_name, email, symbol, shares, buy_price, investment_id),
     )
     db.commit()
     updated = db.execute("SELECT * FROM investments WHERE id = ?", (investment_id,)).fetchone()
@@ -336,6 +367,7 @@ if __name__ == "__main__":
     print(" Dashboard    : http://localhost:5000/dashboard")
     print(" Admin        : http://localhost:5000/admin")
     print(f" Admin login  : {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
+    print(" Allowed stocks: TSLA, AAPL, NVDA, MSFT")
     if not YFINANCE_AVAILABLE:
         print(" WARNING: yfinance is not installed — prices will not load.")
         print("          Run: pip install yfinance")
