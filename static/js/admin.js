@@ -216,8 +216,8 @@ function setupEditModal() {
     const payload = {
       user_name: document.getElementById("editUserName").value,
       symbol: document.getElementById("editSymbol").value,
-      shares: document.getElementById("editShares").value,
-      buy_price: document.getElementById("editBuyPrice").value,
+      shares: parseFloat(document.getElementById("editShares").value),
+      buy_price: parseFloat(document.getElementById("editBuyPrice").value),
     };
 
     const res = await fetch(`/api/admin/investments/${editingId}`, {
