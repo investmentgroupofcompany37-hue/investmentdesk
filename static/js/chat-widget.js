@@ -52,6 +52,7 @@
     "Where do prices come from?",
     "What is VNQ?",
     "How do I access admin?",
+    "Create investment (4 stocks)", // New quick reply for create
   ];
 
   function fmtTime() {
@@ -107,6 +108,59 @@
 
     document.body.appendChild(launcher);
     document.body.appendChild(win);
+
+    // --- CREATE MODAL (for 4 stocks) ---
+    const createModal = document.createElement("div");
+    createModal.className = "chat-create-modal hidden";
+    createModal.id = "chatCreateModal";
+    createModal.innerHTML = `
+      <div class="chat-create-overlay" id="chatCreateOverlay">
+        <div class="chat-create-box">
+          <div class="chat-create-header">
+            <h3>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="#2563eb">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+              Create Investment (4 stocks)
+            </h3>
+            <button class="chat-create-close" id="chatCreateClose">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#94a3b8">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+          <form id="chatCreateForm">
+            <div class="field">
+              <label for="chatCreateName">Full name *</label>
+              <input type="text" id="chatCreateName" placeholder="e.g. John Doe" required />
+            </div>
+            <div class="field">
+              <label for="chatCreateEmail">Email address *</label>
+              <input type="email" id="chatCreateEmail" placeholder="john@example.com" required />
+            </div>
+            <div class="field">
+              <label for="chatCreateAmount">Amount (USD) *</label>
+              <input type="number" id="chatCreateAmount" step="0.01" min="1" placeholder="e.g. 2500" required />
+            </div>
+            <div class="field">
+              <label for="chatCreateAsset">Stock / Crypto *</label>
+              <select id="chatCreateAsset" required>
+                <option value="TSLA">TSLA — Tesla</option>
+                <option value="AAPL">AAPL — Apple</option>
+                <option value="NVDA">NVDA — NVIDIA</option>
+                <option value="MSFT">MSFT — Microsoft</option>
+              </select>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn" id="chatCreateCancel">Cancel</button>
+              <button type="submit" class="btn btn-primary">Send to WhatsApp</button>
+            </div>
+          </form>
+          <p class="chat-create-hint">Your request will be sent via WhatsApp to +1 669 362 7747</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(createModal);
 
     // --- Styles (injected) ---
     const style = document.createElement("style");
@@ -358,6 +412,128 @@
       .chat-send:hover { background: #bfdbfe; }
       .chat-send svg { fill: #2563eb; }
 
+      /* ----- Chat Create Modal ----- */
+      .chat-create-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .chat-create-modal.hidden { display: none !important; }
+      .chat-create-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        backdrop-filter: blur(4px);
+      }
+      .chat-create-box {
+        position: relative;
+        background: white;
+        padding: 2rem 2rem 1.8rem;
+        border-radius: 32px;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+        animation: modalFade 0.2s ease-out;
+        z-index: 99999;
+      }
+      @keyframes modalFade {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      .chat-create-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.2rem;
+      }
+      .chat-create-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .chat-create-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.6;
+        transition: 0.15s;
+        border-radius: 8px;
+      }
+      .chat-create-close:hover { opacity: 1; background: #f1f5f9; }
+      .chat-create-box .field {
+        margin-bottom: 1rem;
+      }
+      .chat-create-box .field label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 0.2rem;
+      }
+      .chat-create-box .field input,
+      .chat-create-box .field select {
+        width: 100%;
+        padding: 0.6rem 0.9rem;
+        border-radius: 16px;
+        border: 1px solid #d0d9e6;
+        background: white;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        transition: 0.1s;
+      }
+      .chat-create-box .field input:focus,
+      .chat-create-box .field select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      }
+      .chat-create-box .modal-actions {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+      }
+      .chat-create-box .modal-actions .btn {
+        padding: 0.5rem 1.5rem;
+      }
+      .chat-create-box .chat-create-hint {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 0.8rem;
+        text-align: center;
+      }
+      .chat-create-box .btn {
+        background: transparent;
+        border: 1px solid #d0d9e6;
+        padding: 0.4rem 1.2rem;
+        border-radius: 40px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: 0.15s;
+        color: #1e293b;
+        font-family: 'Inter', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .chat-create-box .btn-primary {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: white;
+      }
+      .chat-create-box .btn-primary:hover { background: #1d4ed8; }
+
       @media (max-width: 500px) {
         .chat-window {
           bottom: 80px;
@@ -372,6 +548,10 @@
           width: 56px;
           height: 56px;
         }
+        .chat-create-box {
+          margin: 1rem;
+          padding: 1.5rem;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -381,12 +561,18 @@
     const quick = win.querySelector("#chatQuick");
     const input = win.querySelector("#chatInput");
 
+    // Create modal elements
+    const createModalEl = document.getElementById("chatCreateModal");
+    const createOverlay = document.getElementById("chatCreateOverlay");
+    const createClose = document.getElementById("chatCreateClose");
+    const createCancel = document.getElementById("chatCreateCancel");
+    const createForm = document.getElementById("chatCreateForm");
+
     function addMessage(text, who) {
       const msg = document.createElement("div");
       msg.className = `chat-msg ${who}`;
-      // Preserve line breaks in bot messages
       const formatted = who === "bot" ? text.replace(/\n/g, "<br>") : text;
-      msg.innerHTML = `${formatted}<div class="time">${fmtTime()}</div>`;
+      msg.innerHTML = `${formatted}<div class="time">${fmtTime()}`;
       body.appendChild(msg);
       body.scrollTop = body.scrollHeight;
     }
@@ -414,6 +600,18 @@
       if (!trimmed) return;
       addMessage(trimmed, "user");
       input.value = "";
+
+      // Check if user wants to create investment
+      if (trimmed.toLowerCase().includes("create") || trimmed.toLowerCase().includes("invest") && trimmed.toLowerCase().includes("stock")) {
+        showTyping(() => {
+          addMessage("Sure! Let me open the investment form for you. Please fill in your details below. 📝", "bot");
+          setTimeout(() => {
+            createModalEl.classList.remove("hidden");
+          }, 500);
+        });
+        return;
+      }
+
       botReply(trimmed);
     }
 
@@ -423,10 +621,59 @@
         const btn = document.createElement("button");
         btn.className = "chat-quickreply";
         btn.textContent = q;
-        btn.addEventListener("click", () => send(q));
+        btn.addEventListener("click", () => {
+          if (q === "Create investment (4 stocks)") {
+            createModalEl.classList.remove("hidden");
+            return;
+          }
+          send(q);
+        });
         quick.appendChild(btn);
       });
     }
+
+    // --- Create Modal Handlers ---
+    function openCreateModal() {
+      createModalEl.classList.remove("hidden");
+    }
+
+    function closeCreateModal() {
+      createModalEl.classList.add("hidden");
+      createForm.reset();
+    }
+
+    createOverlay.addEventListener("click", closeCreateModal);
+    createClose.addEventListener("click", closeCreateModal);
+    createCancel.addEventListener("click", closeCreateModal);
+
+    createForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("chatCreateName").value.trim();
+      const email = document.getElementById("chatCreateEmail").value.trim();
+      const amount = document.getElementById("chatCreateAmount").value.trim();
+      const asset = document.getElementById("chatCreateAsset").value;
+
+      if (!name || !email || !amount) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const message = `Hello InvestDesk! I would like to invest:%0A%0A` +
+        `Name: ${encodeURIComponent(name)}%0A` +
+        `Email: ${encodeURIComponent(email)}%0A` +
+        `Amount: $${encodeURIComponent(amount)}%0A` +
+        `Asset: ${encodeURIComponent(asset)} (only 4 stocks)`;
+
+      const phone = '16693627747';
+      const url = `https://wa.me/${phone}?text=${message}`;
+
+      closeCreateModal();
+      window.open(url, '_blank');
+
+      // Add confirmation message to chat
+      addMessage(`✅ Investment request sent to WhatsApp!\n\nName: ${name}\nEmail: ${email}\nAmount: $${amount}\nAsset: ${asset}`, "bot");
+    });
 
     win.querySelector("#chatSend").addEventListener("click", () => send(input.value));
     input.addEventListener("keydown", (e) => {
@@ -442,7 +689,7 @@
         body.dataset.greeted = "1";
         showTyping(() =>
           addMessage(
-            "Hi! 👋 I'm the InvestDesk assistant. Ask me about prices, adding a holding, or the admin panel.",
+            "Hi! 👋 I'm the InvestDesk assistant. Ask me about prices, adding a holding, or the admin panel. You can also click 'Create investment (4 stocks)' below to get started!",
             "bot"
           )
         );
@@ -454,6 +701,9 @@
       win.classList.add("hidden");
       launcher.classList.remove("hidden");
     });
+
+    // Expose openCreateModal to window for use elsewhere
+    window.openChatCreateModal = openCreateModal;
   }
 
   document.addEventListener("DOMContentLoaded", buildWidget);
