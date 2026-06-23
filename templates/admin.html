@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InvestDesk · Admin</title>
+  <title>InvestDesk · Admin · 4 Stocks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -515,7 +515,7 @@
               <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
               INVESTDESK
             </div>
-            <div class="sub">Admin console</div>
+            <div class="sub">Admin · 4 stocks</div>
           </div>
           <nav class="rail-nav">
             <a class="rail-link" href="/dashboard">
@@ -536,7 +536,7 @@
           <div class="main-header">
             <h1>
               <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
-              <span class="live-dot"></span> All investments
+              <span class="live-dot"></span> 4 stocks · TSLA, AAPL, NVDA, MSFT
             </h1>
             <div class="meta">Create · Edit · Delete</div>
           </div>
@@ -549,7 +549,7 @@
 
           <div class="panel">
             <div class="panel-head">
-              <h2>All holdings</h2>
+              <h2>Holdings (only TSLA, AAPL, NVDA, MSFT)</h2>
               <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
                 <button class="btn btn-sm btn-success" id="createBtn">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -572,7 +572,7 @@
             </table>
             <div class="empty-state" id="adminEmpty">
               <div class="icon">◌</div>
-              No investment records yet. Click <strong>New</strong> to add one.
+              No records for the 4 stocks. Click <strong>New</strong> to add one.
             </div>
           </div>
         </main>
@@ -594,13 +594,12 @@
           <input type="text" id="editUserName" required />
         </div>
         <div class="field">
-          <label for="editSymbol">Symbol</label>
+          <label for="editSymbol">Symbol (only 4 stocks)</label>
           <select id="editSymbol" required>
             <option value="TSLA">TSLA — Tesla</option>
             <option value="AAPL">AAPL — Apple</option>
             <option value="NVDA">NVDA — NVIDIA</option>
             <option value="MSFT">MSFT — Microsoft</option>
-            <option value="VNQ">VNQ — Real Estate (ETF)</option>
           </select>
         </div>
         <div class="field">
@@ -621,7 +620,7 @@
 
   <script>
     (function() {
-      // Toast
+      // ----- toast -----
       const toast = document.getElementById('toast');
       let toastTimer = null;
       function showToast(msg, type = 'success') {
@@ -631,7 +630,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
-      // Auth
+      // ----- auth -----
       const loginShell = document.getElementById('loginShell');
       const adminShell = document.getElementById('adminShell');
       const loginError = document.getElementById('loginError');
@@ -697,12 +696,17 @@
         showToast('Signed out.', 'success');
       });
 
-      // Data
+      // ----- data loading (filter only 4 stocks) -----
+      const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
+
       async function loadAdminData() {
         try {
           const invRes = await fetch('/api/admin/investments');
           if (!invRes.ok) throw new Error('Failed to fetch investments');
-          const investments = await invRes.json();
+          let investments = await invRes.json();
+          // filter to only the 4 stocks
+          investments = investments.filter(inv => ALLOWED_SYMBOLS.includes(inv.symbol));
+
           const priceRes = await fetch('/api/prices');
           const priceData = await priceRes.json();
           const prices = priceData.prices || {};
@@ -752,7 +756,7 @@
                     <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     Delete
                   </button>
-                  <button class="btn-icon create" data-id="${inv.id}" title="Create similar">
+                  <button class="btn-icon create" data-id="${inv.id}" title="Create similar (only 4 stocks)">
                     <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     Copy
                   </button>
@@ -763,7 +767,7 @@
         });
         tbody.innerHTML = html;
 
-        // Attach events
+        // attach events
         tbody.querySelectorAll('.btn-icon.edit').forEach(btn => {
           btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
@@ -802,7 +806,7 @@
         document.getElementById('statTotalValue').textContent = '$' + totalValue.toFixed(2);
       }
 
-      // Modal
+      // ----- modal -----
       const editOverlay = document.getElementById('editModalOverlay');
       const editId = document.getElementById('editId');
       const editUserName = document.getElementById('editUserName');
@@ -813,16 +817,21 @@
       const modalTitleText = document.getElementById('modalTitleText');
       const modalSubmitBtn = document.getElementById('modalSubmitBtn');
 
-      let currentMode = 'edit'; // 'edit' or 'create'
+      let currentMode = 'edit';
 
       function openEditModal(inv, mode = 'edit') {
         currentMode = mode;
         if (mode === 'create') {
-          modalTitleText.textContent = 'Create new investment';
+          modalTitleText.textContent = 'Create new (4 stocks only)';
           modalSubmitBtn.textContent = 'Create';
           editId.value = '';
           editUserName.value = inv.user_name || '';
-          editSymbol.value = inv.symbol || 'TSLA';
+          // ensure symbol is one of the 4
+          if (ALLOWED_SYMBOLS.includes(inv.symbol)) {
+            editSymbol.value = inv.symbol;
+          } else {
+            editSymbol.value = 'TSLA';
+          }
           editShares.value = inv.shares || 1;
           editBuyPrice.value = inv.buy_price || 100;
         } else {
@@ -840,12 +849,17 @@
       cancelEdit.addEventListener('click', () => editOverlay.classList.add('hidden'));
       editOverlay.addEventListener('click', (e) => { if (e.target === editOverlay) editOverlay.classList.add('hidden'); });
 
-      // Submit (create / edit)
+      // submit (create / edit) – enforce 4 stocks
       document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const symbol = editSymbol.value;
+        if (!ALLOWED_SYMBOLS.includes(symbol)) {
+          showToast('Only TSLA, AAPL, NVDA, MSFT are allowed.', 'error');
+          return;
+        }
         const payload = {
           user_name: editUserName.value.trim(),
-          symbol: editSymbol.value,
+          symbol: symbol,
           shares: parseFloat(editShares.value),
           buy_price: parseFloat(editBuyPrice.value)
         };
@@ -879,7 +893,7 @@
         }
       });
 
-      // Delete
+      // delete
       async function deleteInvestment(id) {
         try {
           const res = await fetch(`/api/admin/investments/${id}`, { method: 'DELETE' });
@@ -894,13 +908,13 @@
         }
       }
 
-      // Create new (blank)
+      // create new (blank)
       document.getElementById('createBtn').addEventListener('click', function() {
         const blank = { user_name: '', symbol: 'TSLA', shares: 1, buy_price: 100 };
         openEditModal(blank, 'create');
       });
 
-      // Refresh
+      // refresh
       document.getElementById('refreshBtn').addEventListener('click', function() {
         loadAdminData();
         showToast('Refreshing...', 'success');
@@ -912,7 +926,7 @@
         return div.innerHTML;
       }
 
-      // Init
+      // init
       loginUsername.value = 'admin';
       loginPassword.value = 'admin123';
       checkAdminSession();
