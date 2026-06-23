@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestDesk · Dashboard</title>
-  <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -32,8 +31,6 @@
       display: flex;
       flex-wrap: wrap;
     }
-
-    /* ----- ticker (modern) ----- */
     .ticker-tape {
       background: #0b1b33;
       color: #b9c8e0;
@@ -56,7 +53,6 @@
     .ticker-item .change-down { color: #f87171; }
     @keyframes tickerScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
 
-    /* ----- rail (sidebar) with icons ----- */
     .rail {
       width: 230px;
       background: #fafcff;
@@ -133,7 +129,6 @@
       color: #0b1b33;
     }
 
-    /* ----- main ----- */
     .main {
       flex: 1;
       padding: 1.8rem 2rem 2rem;
@@ -179,7 +174,6 @@
     }
     .meta svg { width: 16px; height: 16px; fill: #64748b; }
 
-    /* summary strip with icons */
     .summary-strip {
       display: grid;
       grid-template-columns: repeat(5,1fr);
@@ -223,7 +217,6 @@
     }
     .section-label svg { width: 20px; height: 20px; fill: #2563eb; }
 
-    /* asset grid - modern cards with subtle icon */
     .asset-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px,1fr));
@@ -250,7 +243,6 @@
     .asset-card .price { font-size: 1.1rem; font-weight: 500; margin-top: 0.1rem; }
     .asset-card .chg { font-size: 0.75rem; font-weight: 500; }
 
-    /* panel / table */
     .panel {
       background: #fafcff;
       border-radius: 20px;
@@ -301,7 +293,6 @@
     .empty-state { text-align:center; padding:2rem 0; color:#64748b; }
     .empty-state .icon { font-size:2rem; opacity:0.4; }
 
-    /* testimonials - light, with images & subtle icons */
     .testimonials-section {
       margin-top: 2.5rem;
       background: #f8fafc;
@@ -357,7 +348,6 @@
       font-style: italic;
     }
 
-    /* contact bar */
     .contact-bar {
       margin-top: 1.2rem;
       font-size: 0.8rem;
@@ -382,26 +372,94 @@
     .contact-bar a:hover { text-decoration:underline; }
     .contact-bar svg { width: 16px; height: 16px; fill: #2563eb; }
 
-    /* modal */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.2); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; z-index:999; }
-    .modal-overlay.hidden { display:none; }
-    .modal { background:white; padding:2rem; border-radius:32px; max-width:400px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.08); }
-    .modal h3 { margin-bottom:1.2rem; display:flex; align-items:center; gap:0.4rem; }
-    .modal h3 svg { width: 24px; height: 24px; fill: #2563eb; }
-    .field { margin-bottom:0.8rem; }
-    .field label { display:block; font-size:0.75rem; font-weight:500; color:#475569; margin-bottom:0.2rem; }
-    .field input, .field select { width:100%; padding:0.5rem 0.75rem; border-radius:14px; border:1px solid #d0d9e6; background:white; }
-    .modal-actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1.2rem; }
+    /* MODAL – fixed positioning */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    .modal-overlay.hidden {
+      display: none !important;
+    }
+    .modal {
+      background: white;
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 32px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+      animation: modalFade 0.2s ease-out;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .modal h3 svg { width: 26px; height: 26px; fill: #2563eb; }
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 0.2rem;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border-radius: 16px;
+      border: 1px solid #d0d9e6;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      transition: 0.1s;
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+    .modal-actions .btn { padding: 0.5rem 1.5rem; }
+    .modal-hint {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 0.8rem;
+      text-align: center;
+    }
 
     @media (max-width:720px) {
       .rail { width:100%; border-right:none; border-bottom:1px solid #e8edf6; }
       .summary-strip { grid-template-columns:repeat(3,1fr); }
+      .main { padding: 1.2rem; }
+      .modal { margin: 1rem; }
+    }
+    @media (max-width:480px) {
+      .summary-strip { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== TICKER ===== -->
+<!-- TICKER -->
 <div class="ticker-tape">
   <div class="ticker-track" id="tickerTrack">
     <div class="ticker-item"><span class="sym">TSLA</span> $243.50 <span class="change-up">▲ 1.2%</span></div>
@@ -414,9 +472,9 @@
   </div>
 </div>
 
-<!-- ===== SHELL ===== -->
+<!-- SHELL -->
 <div class="shell">
-  <!-- RAIL with SVG icons -->
+  <!-- RAIL -->
   <aside class="rail">
     <div class="rail-brand">
       <div class="mark">
@@ -446,7 +504,6 @@
 
   <!-- MAIN -->
   <main class="main">
-    <!-- header -->
     <div class="main-header">
       <h1>
         <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
@@ -458,7 +515,7 @@
       </div>
     </div>
 
-    <!-- summary with icons -->
+    <!-- summary -->
     <div class="summary-strip">
       <div class="summary-cell"><div class="label"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Market value</div><div class="value mono tabular" id="sumValue">$184,230.00</div></div>
       <div class="summary-cell"><div class="label"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>Cost basis</div><div class="value mono tabular" id="sumCost">$162,400.00</div></div>
@@ -470,23 +527,22 @@
     <!-- live assets -->
     <div class="section-label">
       <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-      Live prices
+      Live prices (4 stocks)
     </div>
     <div class="asset-grid" id="assetGrid">
       <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>TSLA</div><div class="price">$243.50</div><div class="chg" style="color:#22c55e;">+1.2%</div></div>
       <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>AAPL</div><div class="price">$178.20</div><div class="chg" style="color:#22c55e;">+0.6%</div></div>
       <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>NVDA</div><div class="price">$875.40</div><div class="chg" style="color:#22c55e;">+2.4%</div></div>
       <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>MSFT</div><div class="price">$415.10</div><div class="chg" style="color:#ef4444;">-0.2%</div></div>
-      <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>VNQ</div><div class="price">$89.70</div><div class="chg" style="color:#22c55e;">+0.3%</div></div>
     </div>
 
-    <!-- holdings -->
+    <!-- holdings panel with CREATE button -->
     <div class="panel">
       <div class="panel-head">
         <h2><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>Your holdings</h2>
-        <button class="btn btn-primary" id="openAddModal">
+        <button class="btn btn-primary" id="openCreateModal">
           <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-          Add investment
+          Create (4 stocks)
         </button>
       </div>
       <table>
@@ -500,38 +556,35 @@
       <div class="empty-state" id="holdingsEmpty" style="display:none;"><div class="icon">◌</div>No holdings yet.</div>
     </div>
 
-    <!-- TESTIMONIALS with images -->
+    <!-- testimonials -->
     <div class="testimonials-section">
-      <h3>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        Investor voices
-      </h3>
+      <h3><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>Investor voices</h3>
       <div class="testimonial-grid">
         <div class="testimonial-card">
           <div class="person">
             <img class="avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah" />
             <div><div class="name">Sarah K.</div><div class="role">Angel investor</div></div>
           </div>
-          <div class="quote">“InvestDesk gives me real-time clarity. I check my portfolio daily — it's become my command center.”</div>
+          <div class="quote">"InvestDesk gives me real-time clarity. I check my portfolio daily — it's become my command center."</div>
         </div>
         <div class="testimonial-card">
           <div class="person">
             <img class="avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="David" />
             <div><div class="name">David R.</div><div class="role">Tech founder</div></div>
           </div>
-          <div class="quote">“The light theme is so clean. I love the live ticker and how easy it is to track my holdings.”</div>
+          <div class="quote">"The light theme is so clean. I love the live ticker and how easy it is to track my holdings."</div>
         </div>
         <div class="testimonial-card">
           <div class="person">
             <img class="avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Elena" />
             <div><div class="name">Elena M.</div><div class="role">Portfolio manager</div></div>
           </div>
-          <div class="quote">“Tested many dashboards — this one is fast, beautiful, and the images make it feel human.”</div>
+          <div class="quote">"Tested many dashboards — this one is fast, beautiful, and the images make it feel human."</div>
         </div>
       </div>
     </div>
 
-    <!-- CONTACT -->
+    <!-- contact -->
     <div style="margin-top: 1.8rem; display: flex; justify-content: flex-start;">
       <div class="contact-bar">
         <span>
@@ -548,32 +601,54 @@
   </main>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay hidden" id="addModalOverlay">
+<!-- ===== CREATE MODAL (4 stocks only) ===== -->
+<div class="modal-overlay hidden" id="createModalOverlay">
   <div class="modal">
-    <h3><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Add investment</h3>
-    <form id="addForm">
-      <div class="field"><label for="addSymbol">Symbol</label><select id="addSymbol"><option value="TSLA">TSLA</option><option value="AAPL">AAPL</option><option value="NVDA">NVDA</option><option value="MSFT">MSFT</option><option value="VNQ">VNQ</option></select></div>
-      <div class="field"><label for="addShares">Shares</label><input type="number" id="addShares" step="0.0001" min="0.0001" required /></div>
-      <div class="field"><label for="addBuyPrice">Buy price ($)</label><input type="number" id="addBuyPrice" step="0.01" min="0.01" required /></div>
-      <div class="modal-actions"><button type="button" class="btn" id="cancelAdd">Cancel</button><button type="submit" class="btn btn-primary">Add</button></div>
+    <h3>
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Create investment (4 stocks)
+    </h3>
+    <form id="createForm">
+      <div class="field">
+        <label for="createName">Full name *</label>
+        <input type="text" id="createName" placeholder="e.g. John Doe" required />
+      </div>
+      <div class="field">
+        <label for="createEmail">Email address *</label>
+        <input type="email" id="createEmail" placeholder="john@example.com" required />
+      </div>
+      <div class="field">
+        <label for="createAmount">Amount (USD) *</label>
+        <input type="number" id="createAmount" step="0.01" min="1" placeholder="e.g. 2500" required />
+      </div>
+      <div class="field">
+        <label for="createAsset">Stock / Crypto *</label>
+        <select id="createAsset" required>
+          <option value="TSLA">TSLA — Tesla</option>
+          <option value="AAPL">AAPL — Apple</option>
+          <option value="NVDA">NVDA — NVIDIA</option>
+          <option value="MSFT">MSFT — Microsoft</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="cancelCreate">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send to WhatsApp</button>
+      </div>
     </form>
+    <p class="modal-hint">Your request will be sent via WhatsApp to +1 669 362 7747</p>
   </div>
 </div>
 
 <script>
   (function() {
     // ============================================================
-    // AUTHENTICATION CHECK — redirect to landing if not logged in
+    // AUTH CHECK – redirect if not logged in
     // ============================================================
     const userData = sessionStorage.getItem('investdesk_user');
     if (!userData) {
-      // No user found — redirect to landing page
       window.location.href = '/';
       return;
     }
-
-    // Parse user data and display name
     let currentUser = null;
     try {
       currentUser = JSON.parse(userData);
@@ -583,61 +658,78 @@
       } else if (nameLabel && currentUser.email) {
         nameLabel.textContent = currentUser.email;
       }
-    } catch (e) {
-      console.warn('Could not parse user data');
-    }
+    } catch (e) { console.warn('User data parse error'); }
+
+    // logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      sessionStorage.removeItem('investdesk_user');
+      window.location.href = '/';
+    });
 
     // ============================================================
-    // LOGOUT functionality
+    // CREATE MODAL – only 4 stocks, redirect to WhatsApp
     // ============================================================
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-        sessionStorage.removeItem('investdesk_user');
-        window.location.href = '/';
-      });
-    }
+    const overlay = document.getElementById('createModalOverlay');
+    const openBtn = document.getElementById('openCreateModal');
+    const cancelBtn = document.getElementById('cancelCreate');
+    const createForm = document.getElementById('createForm');
 
-    // ============================================================
-    // MODAL logic (add investment)
-    // ============================================================
-    const overlay = document.getElementById('addModalOverlay');
-    const openBtn = document.getElementById('openAddModal');
-    const cancelBtn = document.getElementById('cancelAdd');
+    // Show modal when Create button is clicked
+    openBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      overlay.classList.remove('hidden');
+      console.log('Modal should be visible now');
+    });
 
-    if (openBtn) {
-      openBtn.addEventListener('click', function() {
-        overlay.classList.remove('hidden');
-      });
-    }
+    // Hide modal on cancel
+    cancelBtn.addEventListener('click', function() {
+      overlay.classList.add('hidden');
+    });
 
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', function() {
+    // Hide modal on overlay click (click outside)
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
         overlay.classList.add('hidden');
-      });
-    }
+      }
+    });
 
-    if (overlay) {
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) {
-          overlay.classList.add('hidden');
-        }
-      });
-    }
+    // Handle form submission
+    createForm.addEventListener('submit', function(e) {
+      e.preventDefault();
 
-    const addForm = document.getElementById('addForm');
-    if (addForm) {
-      addForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        overlay.classList.add('hidden');
-        alert('Position added (demo) — connect to backend for full functionality.');
-      });
-    }
+      // gather fields
+      const name = document.getElementById('createName').value.trim();
+      const email = document.getElementById('createEmail').value.trim();
+      const amount = document.getElementById('createAmount').value.trim();
+      const asset = document.getElementById('createAsset').value;
+
+      if (!name || !email || !amount) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      // build WhatsApp message
+      const message = `Hello InvestDesk! I would like to invest:%0A%0A` +
+        `Name: ${encodeURIComponent(name)}%0A` +
+        `Email: ${encodeURIComponent(email)}%0A` +
+        `Amount: $${encodeURIComponent(amount)}%0A` +
+        `Asset: ${encodeURIComponent(asset)} (only 4 stocks)`;
+
+      const phone = '16693627747'; // +1 669 362 7747
+      const url = `https://wa.me/${phone}?text=${message}`;
+
+      // close modal and redirect
+      overlay.classList.add('hidden');
+      window.open(url, '_blank');
+    });
 
     // ============================================================
-    // Optional: Update ticker with live data (demo placeholder)
+    // Update timestamp
     // ============================================================
-    console.log('Dashboard loaded — user:', currentUser);
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent =
+      'Updated: ' + now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) +
+      ', ' + now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
 
   })();
 </script>
