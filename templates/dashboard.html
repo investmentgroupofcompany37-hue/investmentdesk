@@ -11,33 +11,42 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #f0f4fe;
-      color: #0b1b33;
+      background: #0b1b33;
+      color: #f0f4fe;
       line-height: 1.5;
-      padding: 1.5rem 1rem 2rem;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-image: 
+        linear-gradient(135deg, rgba(11, 27, 51, 0.85) 0%, rgba(37, 99, 235, 0.30) 50%, rgba(11, 27, 51, 0.85) 100%),
+        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      padding: 1.5rem 1rem 2rem;
     }
+
     .shell {
       max-width: 1440px;
       width: 100%;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
       border-radius: 32px;
-      box-shadow: 0 20px 60px rgba(0,20,50,0.06), 0 2px 12px rgba(0,0,0,0.02);
-      border: 1px solid #e8edf6;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 2px 12px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
       overflow: hidden;
       display: flex;
       flex-wrap: wrap;
     }
+
     .ticker-tape {
-      background: #0b1b33;
+      background: rgba(11, 27, 51, 0.95);
       color: #b9c8e0;
       padding: 0.5rem 0;
       overflow: hidden;
       white-space: nowrap;
-      border-bottom: 1px solid #1e2f4a;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       font-size: 0.85rem;
       width: 100%;
       letter-spacing: 0.01em;
@@ -55,9 +64,10 @@
 
     .rail {
       width: 230px;
-      background: #fafcff;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(8px);
       padding: 2rem 1.2rem 1.5rem;
-      border-right: 1px solid #e8edf6;
+      border-right: 1px solid rgba(0,0,0,0.06);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -80,7 +90,7 @@
       gap: 0.6rem;
       padding: 0.6rem 0.75rem;
       border-radius: 12px;
-      color: #64748b;
+      color: #475569;
       text-decoration: none;
       font-weight: 500;
       font-size: 0.9rem;
@@ -88,16 +98,16 @@
     }
     .rail-link svg { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
     .rail-link.active {
-      background: #dbeafe;
+      background: rgba(37, 99, 235, 0.15);
       color: #2563eb;
       font-weight: 600;
     }
-    .rail-link:hover:not(.active) { background: #f1f5f9; }
+    .rail-link:hover:not(.active) { background: rgba(0,0,0,0.04); }
     .rail-foot {
       margin-top: auto;
       font-size: 0.75rem;
       color: #64748b;
-      border-top: 1px solid #e8edf6;
+      border-top: 1px solid rgba(0,0,0,0.06);
       padding-top: 1rem;
       display: flex;
       flex-direction: column;
@@ -112,7 +122,7 @@
     .rail-foot svg { width: 18px; height: 18px; fill: #64748b; }
     .btn-logout {
       background: transparent;
-      border: 1px solid #e8edf6;
+      border: 1px solid rgba(0,0,0,0.1);
       padding: 0.3rem 0.8rem;
       border-radius: 40px;
       font-size: 0.7rem;
@@ -124,15 +134,16 @@
       width: fit-content;
     }
     .btn-logout:hover {
-      background: #f1f5f9;
-      border-color: #d0d9e6;
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.2);
       color: #0b1b33;
     }
 
     .main {
       flex: 1;
       padding: 1.8rem 2rem 2rem;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
       min-width: 0;
     }
     .main-header {
@@ -149,6 +160,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: #0b1b33;
     }
     .main-header h1 svg { width: 28px; height: 28px; fill: #2563eb; }
     .live-dot {
@@ -158,19 +170,20 @@
       background: #22c55e;
       border-radius: 50%;
       margin-right: 0.2rem;
-      box-shadow: 0 0 0 3px #dcfce7;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.3);
       animation: pulse-dot 2s infinite;
     }
     @keyframes pulse-dot { 0% { opacity:1; } 50% { opacity:0.5; } 100% { opacity:1; } }
     .meta {
-      color: #64748b;
+      color: #475569;
       font-size: 0.8rem;
-      background: #f1f5f9;
+      background: rgba(255,255,255,0.6);
       padding: 0.3rem 1rem;
       border-radius: 40px;
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      border: 1px solid rgba(0,0,0,0.04);
     }
     .meta svg { width: 16px; height: 16px; fill: #64748b; }
 
@@ -181,10 +194,11 @@
       margin-bottom: 2rem;
     }
     .summary-cell {
-      background: #f8fafc;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
       padding: 0.8rem 1rem;
       border-radius: 16px;
-      border: 1px solid #e8edf6;
+      border: 1px solid rgba(255,255,255,0.3);
       transition: 0.1s;
       display: flex;
       flex-direction: column;
@@ -203,12 +217,13 @@
       font-size: 1.2rem;
       font-weight: 600;
       margin-top: 0.15rem;
+      color: #0b1b33;
     }
 
     .section-label {
       font-weight: 600;
       font-size: 1rem;
-      color: #1e293b;
+      color: #0b1b33;
       margin: 1.8rem 0 0.8rem;
       letter-spacing: -0.01em;
       display: flex;
@@ -219,34 +234,51 @@
 
     .asset-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px,1fr));
-      gap: 0.8rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+      gap: 1rem;
       margin-bottom: 2rem;
     }
     .asset-card {
-      background: #f8fafc;
-      padding: 0.9rem 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 1rem 1rem 0.8rem;
       border-radius: 18px;
-      border: 1px solid #e8edf6;
-      transition: 0.1s;
+      border: 1px solid rgba(255,255,255,0.4);
+      transition: 0.15s;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      min-height: 120px;
     }
+    .asset-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.08;
+      z-index: 0;
+    }
+    .asset-card:hover { transform: translateY(-2px); border-color: rgba(37,99,235,0.3); }
+    .asset-card > * { position: relative; z-index: 1; }
     .asset-card .sym {
       font-weight: 600;
       font-size: 1rem;
       display: flex;
       align-items: center;
       gap: 0.3rem;
+      color: #0b1b33;
     }
     .asset-card .sym svg { width: 18px; height: 18px; fill: #2563eb; }
-    .asset-card .price { font-size: 1.1rem; font-weight: 500; margin-top: 0.1rem; }
+    .asset-card .price { font-size: 1.2rem; font-weight: 600; color: #0b1b33; margin-top: 0.1rem; }
     .asset-card .chg { font-size: 0.75rem; font-weight: 500; }
 
     .panel {
-      background: #fafcff;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(8px);
       border-radius: 20px;
-      border: 1px solid #e8edf6;
+      border: 1px solid rgba(255,255,255,0.3);
       padding: 1.2rem 1.2rem 0.5rem;
       margin-top: 1rem;
     }
@@ -264,11 +296,12 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      color: #0b1b33;
     }
     .panel-head h2 svg { width: 22px; height: 22px; fill: #2563eb; }
     .btn {
-      background: transparent;
-      border: 1px solid #d0d9e6;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.1);
       padding: 0.4rem 1.2rem;
       border-radius: 40px;
       font-weight: 500;
@@ -279,6 +312,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
+      backdrop-filter: blur(4px);
     }
     .btn svg { width: 16px; height: 16px; fill: currentColor; }
     .btn-primary {
@@ -288,17 +322,18 @@
     }
     .btn-primary:hover { background: #1d4ed8; }
     table { width:100%; border-collapse:collapse; font-size:0.85rem; }
-    th { text-align:left; padding:0.5rem 0.25rem; color:#64748b; font-weight:500; border-bottom:1px solid #e8edf6; }
-    td { padding:0.6rem 0.25rem; border-bottom:1px solid #f1f5f9; }
+    th { text-align:left; padding:0.5rem 0.25rem; color:#64748b; font-weight:500; border-bottom:1px solid rgba(0,0,0,0.06); }
+    td { padding:0.6rem 0.25rem; border-bottom:1px solid rgba(0,0,0,0.04); color: #0b1b33; }
     .empty-state { text-align:center; padding:2rem 0; color:#64748b; }
     .empty-state .icon { font-size:2rem; opacity:0.4; }
 
     .testimonials-section {
       margin-top: 2.5rem;
-      background: #f8fafc;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
       border-radius: 24px;
       padding: 1.8rem 1.8rem 1.5rem;
-      border: 1px solid #e8edf6;
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .testimonials-section h3 {
       font-size: 1.1rem;
@@ -307,6 +342,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: #0b1b33;
     }
     .testimonials-section h3 svg { width: 24px; height: 24px; fill: #f59e0b; }
     .testimonial-grid {
@@ -315,11 +351,12 @@
       gap: 1.5rem;
     }
     .testimonial-card {
-      background: white;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
       padding: 1.2rem 1rem 1rem;
       border-radius: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-      border: 1px solid #eef3f9;
+      border: 1px solid rgba(255,255,255,0.4);
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -338,7 +375,7 @@
       border: 2px solid white;
       box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     }
-    .testimonial-card .name { font-weight: 600; font-size: 0.9rem; }
+    .testimonial-card .name { font-weight: 600; font-size: 0.9rem; color: #0b1b33; }
     .testimonial-card .role { font-size: 0.7rem; color: #64748b; }
     .testimonial-card .quote {
       font-size: 0.85rem;
@@ -351,7 +388,8 @@
     .contact-bar {
       margin-top: 1.2rem;
       font-size: 0.8rem;
-      background: #f1f6fe;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(4px);
       padding: 0.6rem 1.4rem;
       border-radius: 60px;
       display: inline-flex;
@@ -359,7 +397,7 @@
       gap: 1.4rem;
       align-items: center;
       color: #1e293b;
-      border: 1px solid #dbeafe;
+      border: 1px solid rgba(255,255,255,0.4);
     }
     .contact-bar a {
       color: #2563eb;
@@ -376,8 +414,8 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -388,13 +426,15 @@
       display: none !important;
     }
     .modal {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
       padding: 2rem 2rem 1.8rem;
       border-radius: 32px;
       max-width: 440px;
       width: 100%;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
       animation: modalFade 0.2s ease-out;
+      border: 1px solid rgba(255,255,255,0.2);
     }
     @keyframes modalFade {
       from { opacity: 0; transform: scale(0.96); }
@@ -407,6 +447,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: #0b1b33;
     }
     .modal h3 svg { width: 26px; height: 26px; fill: #2563eb; }
     .field { margin-bottom: 1rem; }
@@ -421,8 +462,8 @@
       width: 100%;
       padding: 0.6rem 0.9rem;
       border-radius: 16px;
-      border: 1px solid #d0d9e6;
-      background: white;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.8);
       font-family: 'Inter', sans-serif;
       font-size: 0.95rem;
       transition: 0.1s;
@@ -447,7 +488,7 @@
     }
 
     @media (max-width:720px) {
-      .rail { width:100%; border-right:none; border-bottom:1px solid #e8edf6; }
+      .rail { width:100%; border-right:none; border-bottom:1px solid rgba(0,0,0,0.06); }
       .summary-strip { grid-template-columns:repeat(3,1fr); }
       .main { padding: 1.2rem; }
       .modal { margin: 1rem; }
@@ -524,16 +565,36 @@
       <div class="summary-cell"><div class="label"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Holdings</div><div class="value mono tabular" id="sumCount">5</div></div>
     </div>
 
-    <!-- live assets -->
+    <!-- live assets with stock background images -->
     <div class="section-label">
       <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
       Live prices (4 stocks)
     </div>
     <div class="asset-grid" id="assetGrid">
-      <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>TSLA</div><div class="price">$243.50</div><div class="chg" style="color:#22c55e;">+1.2%</div></div>
-      <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>AAPL</div><div class="price">$178.20</div><div class="chg" style="color:#22c55e;">+0.6%</div></div>
-      <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>NVDA</div><div class="price">$875.40</div><div class="chg" style="color:#22c55e;">+2.4%</div></div>
-      <div class="asset-card"><div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>MSFT</div><div class="price">$415.10</div><div class="chg" style="color:#ef4444;">-0.2%</div></div>
+      <!-- TSLA -->
+      <div class="asset-card" style="background-image: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 100%), url('https://images.unsplash.com/photo-1617704548623-340376564e68?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>TSLA</div>
+        <div class="price">$243.50</div>
+        <div class="chg" style="color:#22c55e;">▲ +1.2%</div>
+      </div>
+      <!-- AAPL -->
+      <div class="asset-card" style="background-image: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 100%), url('https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>AAPL</div>
+        <div class="price">$178.20</div>
+        <div class="chg" style="color:#22c55e;">▲ +0.6%</div>
+      </div>
+      <!-- NVDA -->
+      <div class="asset-card" style="background-image: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 100%), url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2065&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>NVDA</div>
+        <div class="price">$875.40</div>
+        <div class="chg" style="color:#22c55e;">▲ +2.4%</div>
+      </div>
+      <!-- MSFT -->
+      <div class="asset-card" style="background-image: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 100%), url('https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>MSFT</div>
+        <div class="price">$415.10</div>
+        <div class="chg" style="color:#ef4444;">▼ -0.2%</div>
+      </div>
     </div>
 
     <!-- holdings panel with CREATE button -->
