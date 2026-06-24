@@ -17,6 +17,7 @@ from datetime import datetime
 from functools import wraps
 import json
 import traceback
+import os
 
 from flask import Flask, jsonify, request, session, send_from_directory, g
 from flask_cors import CORS
@@ -72,27 +73,49 @@ def close_db(exception):
 
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS investments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_name TEXT NOT NULL,
-            symbol TEXT NOT NULL,
-            shares REAL NOT NULL,
-            buy_price REAL NOT NULL,
-            created_at TEXT NOT NULL
+    """Initialize database with all required tables"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS investments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_name TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                shares REAL NOT NULL,
+                buy_price REAL NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
         )
-        """
-    )
-    # Check if email column exists, add if not
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA table_info(investments)")
-    columns = [col[1] for col in cursor.fetchall()]
-    if "email" not in columns:
-        cursor.execute("ALTER TABLE investments ADD COLUMN email TEXT")
-    conn.commit()
-    conn.close()
+        
+        # Check if email column exists, add if not
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(investments)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if "email" not in columns:
+            cursor.execute("ALTER TABLE investments ADD COLUMN email TEXT")
+            print("✅ Added email column to investments table")
+        
+        # Create index for better performance
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_investments_user_name ON investments(user_name)")
+        
+        conn.commit()
+        
+        # Verify table was created
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='investments'")
+        result = cursor.fetchone()
+        if result:
+            print("✅ Investments table exists and is ready")
+        else:
+            print("⚠️ Warning: Investments table was not created properly")
+            
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"❌ Error initializing database: {e}")
+        print(traceback.format_exc())
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -440,6 +463,8 @@ def method_not_allowed(error):
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    # Initialize database before starting the app
+    print("🔄 Initializing database...")
     init_db()
     print("=" * 60)
     print(" Investment Dashboard")
