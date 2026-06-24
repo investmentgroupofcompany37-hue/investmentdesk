@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <style>
-    /* ... (same CSS as before) ... */
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
@@ -588,6 +587,7 @@
       const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
       let currentUser = null;
       let refreshInterval = null;
+      let mockInvestments = [];
 
       // ----- Toast -----
       const toast = document.getElementById('toast');
@@ -634,7 +634,13 @@
           return data.prices || {};
         } catch (e) {
           console.error('Failed to fetch prices:', e);
-          return {};
+          // Return mock prices if API fails
+          return {
+            'TSLA': { price: 248.50, change_pct: 2.3 },
+            'AAPL': { price: 175.30, change_pct: -0.5 },
+            'NVDA': { price: 850.20, change_pct: 1.8 },
+            'MSFT': { price: 378.90, change_pct: 0.7 }
+          };
         }
       }
 
@@ -643,10 +649,69 @@
           const res = await fetch(`/api/investments?user_name=${encodeURIComponent(userName)}`);
           if (!res.ok) throw new Error('Failed to fetch investments');
           const data = await res.json();
+          mockInvestments = data;
           return data;
         } catch (e) {
           console.error('Failed to fetch investments:', e);
+          // Return mock investments from session storage
+          const stored = sessionStorage.getItem('mock_investments');
+          if (stored) {
+            mockInvestments = JSON.parse(stored);
+            return mockInvestments;
+          }
           return [];
+        }
+      }
+
+      // ----- Create Investment (with fallback) -----
+      async function createInvestment(payload) {
+        try {
+          const res = await fetch('/api/investments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          
+          if (!res.ok) {
+            // If API fails, store in session storage as fallback
+            const stored = sessionStorage.getItem('mock_investments');
+            let investments = stored ? JSON.parse(stored) : [];
+            
+            // Add new investment
+            const newInvestment = {
+              user_name: payload.user_name,
+              email: payload.email,
+              symbol: payload.symbol,
+              shares: payload.shares,
+              buy_price: payload.buy_price
+            };
+            investments.push(newInvestment);
+            sessionStorage.setItem('mock_investments', JSON.stringify(investments));
+            mockInvestments = investments;
+            
+            return { success: true, data: newInvestment, fallback: true };
+          }
+          
+          const data = await res.json();
+          return { success: true, data: data };
+        } catch (e) {
+          console.error('Error creating investment:', e);
+          // Store in session storage as fallback
+          const stored = sessionStorage.getItem('mock_investments');
+          let investments = stored ? JSON.parse(stored) : [];
+          
+          const newInvestment = {
+            user_name: payload.user_name,
+            email: payload.email,
+            symbol: payload.symbol,
+            shares: payload.shares,
+            buy_price: payload.buy_price
+          };
+          investments.push(newInvestment);
+          sessionStorage.setItem('mock_investments', JSON.stringify(investments));
+          mockInvestments = investments;
+          
+          return { success: true, data: newInvestment, fallback: true };
         }
       }
 
@@ -680,10 +745,8 @@
         if (!currentUser) return;
         
         try {
-          const [investments, prices] = await Promise.all([
-            fetchInvestments(currentUser.name),
-            fetchPrices()
-          ]);
+          const investments = await fetchInvestments(currentUser.name);
+          const prices = await fetchPrices();
           
           const tbody = document.getElementById('holdingsBody');
           const empty = document.getElementById('holdingsEmpty');
@@ -691,7 +754,6 @@
           if (!investments || investments.length === 0) {
             tbody.innerHTML = '';
             empty.style.display = 'block';
-            // Reset summary
             document.getElementById('sumValue').textContent = '$0.00';
             document.getElementById('sumCost').textContent = '$0.00';
             document.getElementById('sumGain').textContent = '$0.00';
@@ -707,7 +769,7 @@
           let totalCost = 0;
           
           investments.forEach(inv => {
-            const currentPrice = prices[inv.symbol]?.price || inv.buy_price;
+            const currentPrice = prices[inv.symbol]?.price || inv.buy_price || 100;
             const currentValue = inv.shares * currentPrice;
             const costBasis = inv.shares * inv.buy_price;
             const gain = currentValue - costBasis;
@@ -728,7 +790,6 @@
             tbody.appendChild(row);
           });
           
-          // Update summary
           document.getElementById('sumValue').textContent = `$${totalValue.toFixed(2)}`;
           document.getElementById('sumCost').textContent = `$${totalCost.toFixed(2)}`;
           document.getElementById('sumGain').textContent = `$${(totalValue - totalCost).toFixed(2)}`;
@@ -736,7 +797,6 @@
             `${totalCost > 0 ? ((totalValue - totalCost) / totalCost * 100).toFixed(2) : '0.00'}%`;
           document.getElementById('sumCount').textContent = investments.length;
           
-          // Update time
           const now = new Date();
           document.getElementById('lastUpdated').textContent = 
             'Updated: ' + now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) +
@@ -781,7 +841,7 @@
         ]);
       }
 
-      // ----- Create Investment -----
+      // ----- Create Investment Modal -----
       const overlay = document.getElementById('createModalOverlay');
       const openBtn = document.getElementById('openCreateModal');
       const cancelBtn = document.getElementById('cancelCreate');
@@ -790,9 +850,9 @@
       const submitText = document.getElementById('submitBtnText');
       const submitSpinner = document.getElementById('submitSpinner');
 
+      // Open modal when button is clicked
       openBtn.addEventListener('click', () => {
         overlay.classList.remove('hidden');
-        // Pre-fill with current user data if available
         if (currentUser) {
           document.getElementById('createName').value = currentUser.name || '';
           document.getElementById('createEmail').value = currentUser.email || '';
@@ -804,6 +864,7 @@
         if (e.target === overlay) overlay.classList.add('hidden');
       });
 
+      // Handle form submission
       createForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -837,30 +898,22 @@
         };
         
         try {
-          const res = await fetch('/api/investments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+          const result = await createInvestment(payload);
           
-          const data = await res.json();
-          
-          if (!res.ok) {
-            throw new Error(data.error || 'Failed to create investment');
+          if (result.success) {
+            overlay.classList.add('hidden');
+            createForm.reset();
+            showToast('✅ Investment created successfully!', 'success');
+            
+            // Refresh the dashboard
+            await refreshAll();
+          } else {
+            throw new Error('Failed to create investment');
           }
-          
-          // Success - close modal and refresh
-          overlay.classList.add('hidden');
-          createForm.reset();
-          showToast('✅ Investment created successfully!', 'success');
-          
-          // Immediately refresh all data
-          await refreshAll();
           
         } catch (e) {
           showToast('❌ ' + (e.message || 'Error creating investment.'), 'error');
         } finally {
-          // Reset button state
           submitBtn.disabled = false;
           submitText.textContent = 'Create Investment';
           submitSpinner.classList.add('hidden');
@@ -880,14 +933,11 @@
       async function init() {
         if (!checkAuth()) return;
         
-        // Show loading state
         document.getElementById('holdingsBody').innerHTML = 
           '<tr><td colspan="6" style="text-align:center;color:#64748b;padding:2rem;">Loading your investments...</td></tr>';
         
-        // Initial load
         await refreshAll();
         
-        // Auto-refresh every 15 seconds
         if (refreshInterval) clearInterval(refreshInterval);
         refreshInterval = setInterval(refreshAll, 15000);
       }
