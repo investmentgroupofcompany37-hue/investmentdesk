@@ -72,50 +72,164 @@ def close_db(exception):
         db.close()
 
 
+def ensure_tables():
+    """Ensure all required tables exist, create them if they don't"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Check if investments table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='investments'")
+        investments_exists = cursor.fetchone() is not None
+        
+        if not investments_exists:
+            print("📊 Creating investments table...")
+            cursor.execute(
+                """
+                CREATE TABLE investments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    shares REAL NOT NULL,
+                    buy_price REAL NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            print("✅ Created investments table")
+        else:
+            print("✅ Investments table already exists")
+        
+        # Check if users table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+        users_exists = cursor.fetchone() is not None
+        
+        if not users_exists:
+            print("📊 Creating users table...")
+            cursor.execute(
+                """
+                CREATE TABLE users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            print("✅ Created users table")
+        else:
+            print("✅ Users table already exists")
+        
+        # Create indexes
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_investments_user_name ON investments(user_name)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
+        
+        conn.commit()
+        conn.close()
+        
+        # Verify tables
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [row[0] for row in cursor.fetchall()]
+        print(f"📊 Tables in database: {tables}")
+        conn.close()
+        
+        return True
+    except Exception as e:
+        print(f"❌ Error ensuring tables: {e}")
+        print(traceback.format_exc())
+        return False
+
+
 def init_db():
     """Initialize database with all required tables"""
     try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS investments (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_name TEXT NOT NULL,
-                symbol TEXT NOT NULL,
-                shares REAL NOT NULL,
-                buy_price REAL NOT NULL,
-                created_at TEXT NOT NULL
-            )
-            """
-        )
+        # Create database directory if it doesn't exist
+        db_dir = os.path.dirname(DB_PATH)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
         
-        # Check if email column exists, add if not
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(investments)")
-        columns = [col[1] for col in cursor.fetchall()]
-        if "email" not in columns:
-            cursor.execute("ALTER TABLE investments ADD COLUMN email TEXT")
-            print("✅ Added email column to investments table")
+        # Ensure tables exist
+        ensure_tables()
         
-        # Create index for better performance
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_investments_user_name ON investments(user_name)")
-        
-        conn.commit()
-        
-        # Verify table was created
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='investments'")
-        result = cursor.fetchone()
-        if result:
-            print("✅ Investments table exists and is ready")
-        else:
-            print("⚠️ Warning: Investments table was not created properly")
-            
-        conn.close()
         return True
     except Exception as e:
         print(f"❌ Error initializing database: {e}")
         print(traceback.format_exc())
         return False
+
+
+def reset_database():
+    """Reset the database - drop all tables and recreate them"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Drop all tables
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = cursor.fetchall()
+        for table in tables:
+            table_name = table[0]
+            if table_name not in ['sqlite_sequence']:
+                cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+                print(f"✅ Dropped table: {table_name}")
+        
+        conn.commit()
+        conn.close()
+        
+        # Recreate tables
+        ensure_tables()
+        print("✅ Database reset successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Error resetting database: {e}")
+        print(traceback.format_exc())
+        return False
+
+
+# ============================================================
+# IMPORTANT: Initialize database when app starts
+# This runs for both local and production (Render)
+# ============================================================
+print("🔄 Initializing database on app startup...")
+init_db()
+print("✅ Database initialization complete")
+
+
+# ---------------------------------------------------------------------------
+# Admin route to reset database
+# ---------------------------------------------------------------------------
+
+@app.route("/api/admin/reset-db", methods=["POST"])
+@admin_required
+def reset_db_route():
+    """Admin route to reset the database"""
+    try:
+        if reset_database():
+            return jsonify({"ok": True, "message": "Database reset successfully"})
+        else:
+            return jsonify({"error": "Failed to reset database"}), 500
+    except Exception as e:
+        print(f"Error in reset_db_route: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/admin/verify-db", methods=["GET"])
+@admin_required
+def verify_db_route():
+    """Admin route to verify database tables"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return jsonify({"tables": tables, "ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e), "ok": False}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -205,6 +319,85 @@ def static_files(path):
 
 
 # ---------------------------------------------------------------------------
+# Routes — User Registration & Login
+# ---------------------------------------------------------------------------
+
+@app.route("/api/register", methods=["POST"])
+def register():
+    """Register a new user"""
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
+    try:
+        name = (payload.get("name") or "").strip()
+        email = (payload.get("email") or "").strip().lower()
+        password = payload.get("password", "").strip()
+        
+        if not name or not email or not password:
+            return jsonify({"error": "Name, email, and password are required"}), 400
+        
+        if len(password) < 6:
+            return jsonify({"error": "Password must be at least 6 characters"}), 400
+        
+        db = get_db()
+        
+        # Check if user exists
+        existing = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        if existing:
+            return jsonify({"error": "Email already registered"}), 400
+        
+        # Insert new user
+        db.execute(
+            "INSERT INTO users (name, email, password, created_at) VALUES (?, ?, ?, ?)",
+            (name, email, password, datetime.utcnow().isoformat())
+        )
+        db.commit()
+        
+        return jsonify({"ok": True, "message": "User registered successfully"}), 201
+    except Exception as e:
+        print(f"Error in register: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    """Login a user"""
+    try:
+        payload = request.get_json(force=True) or {}
+    except Exception as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    
+    try:
+        email = (payload.get("email") or "").strip().lower()
+        password = payload.get("password", "").strip()
+        
+        if not email or not password:
+            return jsonify({"error": "Email and password are required"}), 400
+        
+        db = get_db()
+        user = db.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password)).fetchone()
+        
+        if not user:
+            return jsonify({"error": "Invalid email or password"}), 401
+        
+        return jsonify({
+            "ok": True,
+            "user": {
+                "id": user["id"],
+                "name": user["name"],
+                "email": user["email"]
+            }
+        })
+    except Exception as e:
+        print(f"Error in login: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+# ---------------------------------------------------------------------------
 # Routes — live prices
 # ---------------------------------------------------------------------------
 
@@ -225,8 +418,12 @@ def api_prices():
 @app.route("/api/investments", methods=["GET"])
 def list_investments():
     try:
+        # Ensure tables exist before querying
+        ensure_tables()
+        
         user_name = request.args.get("user_name", "").strip()
         db = get_db()
+        
         if user_name:
             rows = db.execute(
                 "SELECT * FROM investments WHERE user_name = ? ORDER BY created_at DESC",
@@ -245,8 +442,11 @@ def list_investments():
 
 @app.route("/api/investments", methods=["POST"])
 def create_investment():
-    """User creates an investment (dashboard only)"""
+    """User creates an investment"""
     try:
+        # Ensure tables exist before inserting
+        ensure_tables()
+        
         payload = request.get_json(force=True) or {}
     except Exception as e:
         print(f"JSON parse error: {e}")
@@ -325,6 +525,9 @@ def admin_session():
 @admin_required
 def admin_list_investments():
     try:
+        # Ensure tables exist before querying
+        ensure_tables()
+        
         db = get_db()
         rows = db.execute("SELECT * FROM investments ORDER BY created_at DESC").fetchall()
         return jsonify([dict(r) for r in rows])
@@ -339,6 +542,9 @@ def admin_list_investments():
 def admin_create_investment():
     """Admin creates a new investment record"""
     try:
+        # Ensure tables exist before inserting
+        ensure_tables()
+        
         payload = request.get_json(force=True) or {}
     except Exception as e:
         print(f"JSON parse error: {e}")
@@ -378,6 +584,9 @@ def admin_create_investment():
 @admin_required
 def admin_update_investment(investment_id):
     try:
+        # Ensure tables exist before querying
+        ensure_tables()
+        
         payload = request.get_json(force=True) or {}
     except Exception as e:
         print(f"JSON parse error: {e}")
@@ -421,6 +630,9 @@ def admin_update_investment(investment_id):
 @admin_required
 def admin_delete_investment(investment_id):
     try:
+        # Ensure tables exist before querying
+        ensure_tables()
+        
         db = get_db()
         existing = db.execute("SELECT * FROM investments WHERE id = ?", (investment_id,)).fetchone()
         if not existing:
@@ -459,13 +671,10 @@ def method_not_allowed(error):
 
 
 # ---------------------------------------------------------------------------
-# Entrypoint
+# Entrypoint (only runs when executed directly, not on Render with gunicorn)
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # Initialize database before starting the app
-    print("🔄 Initializing database...")
-    init_db()
     print("=" * 60)
     print(" Investment Dashboard")
     print(" Landing Page : http://localhost:5000")
@@ -473,8 +682,5 @@ if __name__ == "__main__":
     print(" Admin        : http://localhost:5000/admin")
     print(f" Admin login  : {ADMIN_USERNAME} / {ADMIN_PASSWORD}")
     print(" Allowed stocks: TSLA, AAPL, NVDA, MSFT")
-    if not YFINANCE_AVAILABLE:
-        print(" WARNING: yfinance is not installed — prices will not load.")
-        print("          Run: pip install yfinance")
     print("=" * 60)
     app.run(debug=True, host='0.0.0.0', port=5000)
