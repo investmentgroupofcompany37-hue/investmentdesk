@@ -19,7 +19,7 @@ import json
 import traceback
 import os
 
-from flask import Flask, jsonify, request, session, send_from_directory, g
+from flask import Flask, jsonify, request, session, send_from_directory, g, redirect, url_for
 from flask_cors import CORS
 
 try:
@@ -272,11 +272,18 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
+    # Check if user is logged in
+    user = session.get("user")
+    if not user:
+        return redirect(url_for('index'))
     return send_from_directory("templates", "dashboard.html")
 
 
 @app.route("/admin")
 def admin_page():
+    # Only allow access if user is admin
+    if not session.get("is_admin"):
+        return redirect(url_for('index'))
     return send_from_directory("templates", "admin.html")
 
 
@@ -349,6 +356,13 @@ def login():
         
         if not user:
             return jsonify({"error": "Invalid email or password"}), 401
+        
+        # Store user in session
+        session["user"] = {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"]
+        }
         
         return jsonify({
             "ok": True,
