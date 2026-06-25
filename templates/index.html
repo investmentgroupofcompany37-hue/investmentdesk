@@ -4,18 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InvestDesk · Trade Smarter</title>
-    <!-- Inter & Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', system-ui, sans-serif;
             color: #0b1a2f;
@@ -24,7 +19,7 @@
             scroll-behavior: smooth;
         }
 
-        /* ----- TOP RISK BANNER ----- */
+        /* ── RISK BANNER ── */
         .risk-banner {
             background: #0b1a2f;
             color: #94a3b8;
@@ -36,15 +31,10 @@
             position: relative;
             z-index: 5;
         }
-        .risk-banner strong {
-            color: #f8fafc;
-            font-weight: 600;
-        }
-        .risk-banner .highlight {
-            color: #f87171;
-        }
+        .risk-banner strong { color: #f8fafc; font-weight: 600; }
+        .risk-banner .highlight { color: #f87171; }
 
-        /* ----- NAVBAR (glass) ----- */
+        /* ── NAVBAR ── */
         .navbar {
             padding: 0.7rem 2rem;
             display: flex;
@@ -55,9 +45,9 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid #e9edf3;
         }
         .nav-brand {
             font-family: 'Space Grotesk', sans-serif;
@@ -68,19 +58,10 @@
             display: flex;
             align-items: center;
             gap: 0.4rem;
+            text-decoration: none;
         }
-        .nav-brand svg {
-            width: 26px;
-            height: 26px;
-            fill: #2563eb;
-        }
-
-        .nav-cards {
-            display: flex;
-            gap: 0.4rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .nav-brand svg { width: 26px; height: 26px; fill: #2563eb; }
+        .nav-cards { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
         .nav-card {
             background: transparent;
             padding: 0.4rem 1rem;
@@ -89,41 +70,21 @@
             font-size: 0.85rem;
             color: #334155;
             text-decoration: none;
-            transition: 0.15s;
+            transition: background 0.15s, border-color 0.15s;
             border: 1px solid transparent;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
         }
-        .nav-card:hover {
-            background: #f1f5f9;
-            border-color: #e2e8f0;
-        }
-        .nav-card .icon {
-            font-size: 1rem;
-            line-height: 1;
-        }
-        .nav-card.primary {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .nav-card.primary:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
-        }
-        .nav-card.outline {
-            border-color: #cbd5e1;
-            cursor: pointer;
-        }
-        .nav-card.outline:hover {
-            background: #f1f5f9;
-        }
+        .nav-card:hover { background: #f1f5f9; border-color: #e2e8f0; }
+        .nav-card.primary { background: #2563eb; color: white; border-color: #2563eb; font-weight: 600; }
+        .nav-card.primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+        .nav-card.outline { border-color: #cbd5e1; }
+        .nav-card.outline:hover { background: #f1f5f9; }
 
-        /* ===== HERO ===== */
+        /* ── HERO ── */
         .hero-wrapper {
             position: relative;
             min-height: 82vh;
@@ -136,9 +97,8 @@
             inset: 0;
             z-index: 0;
             background:
-                linear-gradient(135deg, rgba(11, 26, 47, 0.70) 0%, rgba(11, 26, 47, 0.35) 60%, rgba(37, 99, 235, 0.20) 100%),
+                linear-gradient(135deg, rgba(11, 26, 47, 0.72) 0%, rgba(11, 26, 47, 0.38) 60%, rgba(37, 99, 235, 0.22) 100%),
                 url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-            filter: saturate(1.1);
         }
         .hero {
             position: relative;
@@ -153,14 +113,15 @@
             width: 100%;
         }
 
+        /* ticker */
         .ticker-wrap {
             width: 100%;
             margin-bottom: 0.5rem;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.08);
             backdrop-filter: blur(4px);
             border-radius: 60px;
             padding: 0.3rem 0.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255,255,255,0.10);
             overflow: hidden;
         }
         .ticker-track {
@@ -170,29 +131,23 @@
             white-space: nowrap;
             font-size: 0.8rem;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255,255,255,0.85);
             padding: 0.2rem 0;
             width: max-content;
         }
-        .ticker-track .item .sym {
-            font-weight: 700;
-            color: #ffffff;
-            margin-right: 0.2rem;
-        }
-        .ticker-track .item .up { color: #4ade80; }
-        .ticker-track .item .down { color: #f87171; }
+        .ticker-track .item .sym { font-weight: 700; color: #fff; margin-right: 0.2rem; }
+        .ticker-track .item .up  { color: #4ade80; }
+        .ticker-track .item .dn  { color: #f87171; }
         @keyframes tickerScroll {
-            0% { transform: translateX(0); }
+            0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
 
-        .hero-left {
-            flex: 1 1 460px;
-            color: #ffffff;
-        }
+        /* hero left */
+        .hero-left { flex: 1 1 460px; color: #fff; }
         .hero-badge {
             display: inline-block;
-            background: rgba(37, 99, 235, 0.25);
+            background: rgba(37,99,235,0.25);
             backdrop-filter: blur(4px);
             color: #bfdbfe;
             font-weight: 600;
@@ -201,7 +156,7 @@
             padding: 0.25rem 1rem;
             border-radius: 60px;
             margin-bottom: 1rem;
-            border: 1px solid rgba(191, 219, 254, 0.25);
+            border: 1px solid rgba(191,219,254,0.25);
         }
         .hero-left h1 {
             font-family: 'Space Grotesk', sans-serif;
@@ -209,64 +164,38 @@
             font-weight: 700;
             line-height: 1.1;
             letter-spacing: -0.02em;
-            color: #ffffff;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.2);
         }
         .hero-left h1 .highlight { color: #60a5fa; }
         .hero-left .sub {
             font-size: 1.05rem;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255,255,255,0.85);
             margin: 1rem 0 1.6rem;
             max-width: 480px;
             line-height: 1.6;
-            text-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
         }
-        .hero-stats-row {
-            display: flex;
-            gap: 2.5rem;
-            padding-top: 1.2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .hero-stats-row .stat .num {
-            font-family: 'Space Grotesk', monospace;
-            font-weight: 700;
-            font-size: 1.6rem;
-            color: #ffffff;
-        }
-        .hero-stats-row .stat .lbl {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 0.04em;
-        }
+        .hero-stats-row { display: flex; gap: 2.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.2); }
+        .hero-stats-row .stat .num { font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.6rem; color: #fff; }
+        .hero-stats-row .stat .lbl { font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.7); letter-spacing: 0.04em; }
 
-        /* Auth card */
+        /* ── AUTH CARD ── */
         .hero-right {
             flex: 0 0 400px;
             max-width: 100%;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(12px);
             border-radius: 32px;
-            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.35);
             padding: 2rem 2rem 1.8rem;
         }
-        .hero-right .card-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 1.4rem;
-            color: #0b1a2f;
-            margin-bottom: 0.2rem;
-        }
-        .hero-right .card-sub {
-            font-size: 0.85rem;
-            color: #475569;
-            margin-bottom: 1.5rem;
-        }
+        .hero-right .card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.4rem; color: #0b1a2f; margin-bottom: 0.2rem; }
+        .hero-right .card-sub { font-size: 0.85rem; color: #475569; margin-bottom: 1.5rem; }
 
+        /* tabs */
         .tabs {
-            display: flex;
-            gap: 0.5rem;
+            display: flex; gap: 0.5rem;
             background: #f1f5f9;
             border-radius: 60px;
             padding: 0.25rem;
@@ -274,1275 +203,888 @@
             border: 1px solid #e9edf3;
         }
         .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 0.5rem 0;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.12s;
-            color: #64748b;
-            font-family: 'Inter', sans-serif;
+            flex: 1; background: transparent; border: none;
+            padding: 0.5rem 0; border-radius: 40px;
+            font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: background 0.12s, color 0.12s;
+            color: #64748b; font-family: 'Inter', sans-serif;
         }
-        .tab-btn.active {
-            background: #ffffff;
-            color: #0b1a2f;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
+        .tab-btn.active { background: #fff; color: #0b1a2f; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .tab-btn:hover:not(.active) { color: #0b1a2f; }
 
         .form-group { display: none; }
         .form-group.active { display: block; }
 
-        .field {
-            margin-bottom: 1rem;
-        }
-        .field label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 0.2rem;
-        }
+        /* fields */
+        .field { margin-bottom: 1rem; }
+        .field label { display: block; font-size: 0.78rem; font-weight: 500; color: #334155; margin-bottom: 0.25rem; }
         .field input {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            background: #fafcff;
-            font-size: 0.95rem;
-            transition: 0.12s;
+            width: 100%; padding: 0.72rem 1rem;
+            border-radius: 16px; border: 1.5px solid #e2e8f0;
+            background: #fafcff; font-size: 0.95rem;
+            transition: border-color 0.12s, box-shadow 0.12s;
+            font-family: 'Inter', sans-serif; color: #0b1a2f;
+        }
+        .field input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .field input.is-error { border-color: #ef4444; background: #fef2f2; }
+        .field input.is-ok { border-color: #22c55e; background: #f0fdf4; }
+
+        .field-error {
+            font-size: 0.7rem; color: #ef4444;
+            margin-top: 0.25rem; display: none;
+        }
+        .field-error.show { display: block; }
+
+        /* server error banner inside card */
+        .server-error {
+            background: #fef2f2; border: 1px solid #fecaca;
+            color: #b91c1c; border-radius: 12px;
+            padding: 0.6rem 1rem; font-size: 0.82rem;
+            margin-bottom: 1rem; display: none;
+            line-height: 1.4;
+        }
+        .server-error.show { display: block; }
+
+        /* submit button */
+        .btn-full {
+            width: 100%; padding: 0.82rem;
+            border: none; border-radius: 60px;
+            font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: background 0.12s, opacity 0.12s;
             font-family: 'Inter', sans-serif;
+            background: #2563eb; color: white;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            position: relative;
         }
-        .field input:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
-        }
-        .field input.error {
-            border-color: #ef4444;
-            background: #fef2f2;
-        }
-        .field input.success {
-            border-color: #22c55e;
-            background: #f0fdf4;
-        }
-        .error-msg {
-            font-size: 0.7rem;
-            color: #ef4444;
-            margin-top: 0.2rem;
+        .btn-full:hover:not(:disabled) { background: #1d4ed8; }
+        .btn-full:disabled { opacity: 0.65; cursor: not-allowed; }
+
+        /* spinner inside button */
+        .btn-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
             display: none;
         }
-        .error-msg.show { display: block; }
+        .btn-full.loading .btn-spinner { display: block; }
+        .btn-full.loading .btn-label { opacity: 0.7; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .btn-full {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.12s;
-            font-family: 'Inter', sans-serif;
-            background: #2563eb;
-            color: white;
-        }
-        .btn-full:hover { background: #1d4ed8; }
-        .btn-full:disabled { opacity: 0.6; cursor: not-allowed; }
+        /* password strength */
+        .strength-bar { height: 4px; border-radius: 4px; margin-top: 0.3rem; background: #e2e8f0; overflow: hidden; }
+        .strength-bar .fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+        .strength-text { font-size: 0.65rem; color: #64748b; margin-top: 0.2rem; display: block; }
 
-        .demo-hint {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-top: 1.2rem;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 1rem;
-        }
-        .demo-hint span {
-            background: #f1f5f9;
-            padding: 0.15rem 0.7rem;
-            border-radius: 40px;
-            font-family: monospace;
-            font-size: 0.65rem;
-            color: #0b1a2f;
-        }
-
-        .strength-bar {
-            height: 4px;
-            border-radius: 4px;
-            margin-top: 0.3rem;
-            background: #e2e8f0;
-            overflow: hidden;
-        }
-        .strength-bar .fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 4px;
-            transition: 0.3s;
-        }
-        .strength-text {
-            font-size: 0.65rem;
-            color: #64748b;
-            margin-top: 0.2rem;
-            display: block;
-        }
-
-        /* ===== FEATURES SECTION - FULL WIDTH CARDS ===== */
-        .features-section {
-            width: 100%;
-            max-width: 100%;
-            padding: 3rem 2rem;
-            background: #ffffff;
-        }
-        .features-section .section-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-        .features-section .section-sub {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 2.5rem;
-            font-size: 1rem;
-        }
-
-        /* Full-width grid - each card takes full width */
-        .features-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: #f8fafc;
-            padding: 2rem 2.5rem;
-            border-radius: 24px;
-            border: 1px solid #e9edf3;
-            transition: 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            scroll-margin-top: 80px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-            width: 100%;
-        }
-        .feature-card:hover {
-            border-color: #2563eb;
-            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.08);
-            transform: translateY(-2px);
-            background: #ffffff;
-        }
-        .feature-card .card-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex: 2 1 300px;
-        }
-        .feature-card .icon {
-            font-size: 3rem;
-            flex-shrink: 0;
-        }
-        .feature-card .card-content {
-            flex: 1;
-        }
-        .feature-card .card-content h3 {
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 0.2rem;
-            letter-spacing: -0.01em;
-        }
-        .feature-card .card-content .desc {
-            font-size: 0.95rem;
-            color: #475569;
-            line-height: 1.6;
-        }
-        .feature-card .card-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex: 1 1 auto;
-            flex-wrap: wrap;
-        }
-        .feature-card .stat-row {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-        .feature-card .stat-row span strong {
-            color: #0b1a2f;
-            font-weight: 700;
-            display: block;
-            font-size: 1.1rem;
-        }
-        .feature-card .badge {
-            display: inline-block;
-            background: #e6f0ff;
-            color: #1d4ed8;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.3rem 1.2rem;
-            border-radius: 30px;
-            letter-spacing: 0.02em;
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; top: 5rem; left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            padding: 0.7rem 1.6rem;
+            border-radius: 60px; font-weight: 500; font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            opacity: 0; transition: opacity 0.22s, transform 0.22s;
+            pointer-events: none; z-index: 999;
             white-space: nowrap;
         }
-        .feature-card.highlight-card {
-            border-color: #2563eb;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #0b1a2f; color: #fff; }
+        .toast.error   { background: #b91c1c; color: #fff; }
 
-        /* ===== CONTACT SECTION ===== */
-        .contact-section {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-            background: #ffffff;
-            border-top: 1px solid #e9edf3;
+        /* ── FEATURES SECTION ── */
+        .features-section { width: 100%; padding: 3rem 2rem; background: #fff; }
+        .section-label { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; }
+        .section-sub { text-align: center; color: #64748b; margin-bottom: 2.5rem; font-size: 1rem; }
+        .features-grid { display: flex; flex-direction: column; gap: 1.5rem; max-width: 1280px; margin: 0 auto; }
+        .feature-card {
+            background: #f8fafc; padding: 2rem 2.5rem;
+            border-radius: 24px; border: 1px solid #e9edf3;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            scroll-margin-top: 80px;
+            display: flex; flex-wrap: wrap;
+            align-items: center; justify-content: space-between;
+            gap: 1.5rem; width: 100%;
         }
-        .contact-section .section-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-        .contact-section .section-sub {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 2rem;
-        }
-        .contact-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-        }
-        .contact-item {
-            background: #f8fafc;
-            padding: 1.5rem 2rem;
-            border-radius: 24px;
-            border: 1px solid #e9edf3;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            transition: 0.15s;
-            min-width: 200px;
-        }
-        .contact-item:hover {
-            border-color: #2563eb;
-            background: #ffffff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-        }
-        .contact-item .icon {
-            font-size: 2rem;
-        }
-        .contact-item .info {
-            display: flex;
-            flex-direction: column;
-        }
-        .contact-item .info .label {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .contact-item .info .value {
-            font-weight: 600;
-            color: #0b1a2f;
-            font-size: 1rem;
-        }
-        .contact-item .info .value a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-        .contact-item .info .value a:hover {
-            text-decoration: underline;
-        }
+        .feature-card:hover { border-color: #2563eb; box-shadow: 0 12px 28px rgba(37,99,235,0.08); transform: translateY(-2px); background: #fff; }
+        .feature-card.highlight-card { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        .feature-card .card-left { display: flex; align-items: center; gap: 1.5rem; flex: 2 1 300px; }
+        .feature-card .icon { font-size: 3rem; flex-shrink: 0; }
+        .feature-card .card-content { flex: 1; }
+        .feature-card .card-content h3 { font-weight: 700; font-size: 1.4rem; margin-bottom: 0.2rem; letter-spacing: -0.01em; }
+        .feature-card .card-content .desc { font-size: 0.95rem; color: #475569; line-height: 1.6; }
+        .feature-card .card-right { display: flex; align-items: center; gap: 1.5rem; flex: 1 1 auto; flex-wrap: wrap; }
+        .feature-card .stat-row { display: flex; gap: 1.5rem; font-size: 0.8rem; color: #64748b; }
+        .feature-card .stat-row span strong { color: #0b1a2f; font-weight: 700; display: block; font-size: 1.1rem; }
+        .feature-card .badge { display: inline-block; background: #e6f0ff; color: #1d4ed8; font-size: 0.7rem; font-weight: 600; padding: 0.3rem 1.2rem; border-radius: 30px; letter-spacing: 0.02em; white-space: nowrap; }
 
-        /* ===== CHARTS SECTION - TRADING STYLE ===== */
-        .charts-section {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-            background: #f1f5f9;
-        }
-        .charts-section .section-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-        .charts-section .section-sub {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 2rem;
-        }
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
+        /* ── CHARTS SECTION ── */
+        .charts-section { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
         .chart-card {
-            background: #0b1a2f;
-            border-radius: 20px;
+            background: #0b1a2f; border-radius: 20px;
             padding: 1.5rem 1.2rem 1.2rem;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
             border: 1px solid #1e2d45;
-            transition: 0.15s;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .chart-card:hover {
-            border-color: #2563eb;
-            box-shadow: 0 12px 40px rgba(37,99,235,0.12);
-        }
-        .chart-card .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-            color: #e2e8f0;
-        }
-        .chart-card .chart-header .name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #ffffff;
-        }
-        .chart-card .chart-header .price {
-            font-weight: 600;
-            color: #ffffff;
-            font-size: 1.1rem;
-        }
-        .chart-card .chart-header .change {
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.15rem 0.6rem;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.06);
-        }
-        .chart-card .chart-header .change.up { color: #4ade80; background: rgba(74, 222, 128, 0.12); }
-        .chart-card .chart-header .change.down { color: #f87171; background: rgba(248, 113, 113, 0.12); }
-        .chart-card .chart-container {
-            position: relative;
-            height: 200px;
-        }
+        .chart-card:hover { border-color: #2563eb; box-shadow: 0 12px 40px rgba(37,99,235,0.12); }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .chart-header .name { font-weight: 700; font-size: 1.1rem; color: #fff; }
+        .chart-header .price { font-weight: 600; color: #fff; font-size: 1.1rem; }
+        .chart-header .change { font-weight: 600; font-size: 0.85rem; padding: 0.15rem 0.6rem; border-radius: 20px; }
+        .chart-header .change.up  { color: #4ade80; background: rgba(74,222,128,0.12); }
+        .chart-header .change.dn  { color: #f87171; background: rgba(248,113,113,0.12); }
+        .chart-container { position: relative; height: 200px; }
 
-        /* ===== WHATSAPP CHAT BUTTON ===== */
-        .whatsapp-chat {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.6rem;
+        /* ── CONTACT SECTION ── */
+        .contact-section { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem; border-top: 1px solid #e9edf3; }
+        .contact-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+        .contact-item {
+            background: #f8fafc; padding: 1.5rem 2rem;
+            border-radius: 24px; border: 1px solid #e9edf3;
+            display: flex; align-items: center; gap: 1rem;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+            min-width: 200px;
         }
-        .whatsapp-btn {
-            background: #25D366;
-            border: none;
-            border-radius: 60px;
-            padding: 0.9rem 1.8rem;
-            color: white;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 8px 28px rgba(37, 211, 102, 0.4);
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-family: 'Inter', sans-serif;
-            text-decoration: none;
-        }
-        .whatsapp-btn:hover {
-            background: #1da851;
-            transform: scale(1.04);
-            box-shadow: 0 12px 36px rgba(37, 211, 102, 0.5);
-        }
-        .whatsapp-btn .icon {
-            font-size: 1.6rem;
-        }
-        .whatsapp-btn .label {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-        .whatsapp-btn .label .small {
-            font-size: 0.65rem;
-            font-weight: 400;
-            opacity: 0.85;
-        }
+        .contact-item:hover { border-color: #2563eb; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.04); }
+        .contact-item .icon { font-size: 2rem; }
+        .contact-item .info { display: flex; flex-direction: column; }
+        .contact-item .info .label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+        .contact-item .info .value { font-weight: 600; color: #0b1a2f; font-size: 1rem; }
+        .contact-item .info .value a { color: #2563eb; text-decoration: none; }
+        .contact-item .info .value a:hover { text-decoration: underline; }
 
-        /* ===== TESTIMONIALS ===== */
-        .testimonials-section {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem 2rem 3rem;
-            background: #ffffff;
-        }
-        .testimonials-section .section-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.8rem;
-        }
-        .testimonial-card {
-            background: #f8fafc;
-            padding: 1.5rem 1.4rem 1.2rem;
-            border-radius: 24px;
-            border: 1px solid #e9edf3;
-            transition: 0.15s;
-        }
+        /* ── TESTIMONIALS ── */
+        .testimonials-section { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 3rem; }
+        .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.8rem; }
+        .testimonial-card { background: #f8fafc; padding: 1.5rem 1.4rem 1.2rem; border-radius: 24px; border: 1px solid #e9edf3; transition: border-color 0.15s; }
         .testimonial-card:hover { border-color: #bfdbfe; }
-        .testimonial-card .person {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 0.6rem;
-        }
-        .testimonial-card .avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 60px;
-            object-fit: cover;
-            border: 2px solid white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-        }
-        .testimonial-card .name {
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-        .testimonial-card .role {
-            font-size: 0.7rem;
-            color: #2563eb;
-            font-weight: 500;
-        }
-        .testimonial-card .stars {
-            color: #f59e0b;
-            letter-spacing: 2px;
-            font-size: 0.85rem;
-            margin-bottom: 0.3rem;
-        }
-        .testimonial-card .quote {
-            font-size: 0.9rem;
-            color: #1e293b;
-            line-height: 1.5;
-            font-style: italic;
-        }
-        .testimonial-card .check {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.7rem;
-            color: #22c55e;
-            font-weight: 600;
-            margin-top: 0.6rem;
-        }
-        .testimonial-card .check svg {
-            width: 16px;
-            height: 16px;
-            fill: #22c55e;
-        }
+        .testimonial-card .person { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+        .testimonial-card .avatar { width: 48px; height: 48px; border-radius: 60px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .testimonial-card .name { font-weight: 700; font-size: 0.95rem; }
+        .testimonial-card .role { font-size: 0.7rem; color: #2563eb; font-weight: 500; }
+        .testimonial-card .stars { color: #f59e0b; letter-spacing: 2px; font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .testimonial-card .quote { font-size: 0.9rem; color: #1e293b; line-height: 1.5; font-style: italic; }
+        .testimonial-card .check { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: #22c55e; font-weight: 600; margin-top: 0.6rem; }
+        .testimonial-card .check svg { width: 16px; height: 16px; fill: #22c55e; }
 
-        /* ===== RISK FOOTER ===== */
-        .risk-footer {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem 2rem 1.5rem;
-            border-top: 1px solid #e9edf3;
-            font-size: 0.7rem;
-            color: #94a3b8;
-            text-align: center;
-            line-height: 1.6;
-            background: #f8fafc;
+        /* ── WHATSAPP ── */
+        .whatsapp-chat { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; }
+        .whatsapp-btn {
+            background: #25D366; border: none; border-radius: 60px;
+            padding: 0.9rem 1.8rem; color: white; font-weight: 700; font-size: 1rem;
+            cursor: pointer; box-shadow: 0 8px 28px rgba(37,211,102,0.4);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            display: flex; align-items: center; gap: 0.6rem;
+            font-family: 'Inter', sans-serif; text-decoration: none;
         }
-        .risk-footer strong {
-            color: #0b1a2f;
-        }
-        .risk-footer .highlight {
-            color: #ef4444;
-            font-weight: 600;
-        }
+        .whatsapp-btn:hover { background: #1da851; transform: scale(1.04); box-shadow: 0 12px 36px rgba(37,211,102,0.5); }
+        .whatsapp-btn .wicon { font-size: 1.6rem; }
+        .whatsapp-btn .wlabel { display: flex; flex-direction: column; line-height: 1.2; }
+        .whatsapp-btn .wlabel .small { font-size: 0.65rem; font-weight: 400; opacity: 0.85; }
 
-        .toast {
-            position: fixed;
-            top: 5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0b1a2f;
-            color: white;
-            padding: 0.7rem 2rem;
-            border-radius: 60px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            pointer-events: none;
-            z-index: 999;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        .toast.success { background: #0b1a2f; }
-        .toast.error { background: #b91c1c; }
+        /* ── FOOTER ── */
+        .risk-footer { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 1.5rem; border-top: 1px solid #e9edf3; font-size: 0.7rem; color: #94a3b8; text-align: center; line-height: 1.6; }
+        .risk-footer strong { color: #0b1a2f; }
+        .risk-footer .highlight { color: #ef4444; font-weight: 600; }
 
+        /* ── RESPONSIVE ── */
         @media (max-width: 860px) {
             .hero { padding: 2rem 1rem; gap: 2rem; }
             .hero-left h1 { font-size: 2.4rem; }
             .hero-right { flex: 0 0 100%; }
-            .navbar { padding: 0.6rem 1rem; background: rgba(255,255,255,0.95); }
-            .nav-cards { gap: 0.3rem; }
+            .navbar { padding: 0.6rem 1rem; }
             .nav-card { font-size: 0.75rem; padding: 0.3rem 0.7rem; }
-            .features-section { padding: 2rem 1rem; }
-            .charts-section { padding: 2rem 1rem; }
-            .testimonials-section { padding: 1.5rem 1rem 2rem; }
-            .hero-wrapper { min-height: 70vh; }
-            .ticker-track { font-size: 0.7rem; gap: 1.5rem; }
+            .features-section, .charts-section, .testimonials-section { padding: 2rem 1rem; }
             .charts-grid { grid-template-columns: 1fr; }
-            .feature-card {
-                padding: 1.5rem;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .feature-card .card-right {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            .whatsapp-btn {
-                padding: 0.7rem 1.2rem;
-                font-size: 0.85rem;
-            }
-            .whatsapp-btn .label .small { display: none; }
+            .feature-card { padding: 1.5rem; flex-direction: column; align-items: flex-start; }
+            .feature-card .card-right { width: 100%; }
+            .whatsapp-btn { padding: 0.7rem 1.2rem; font-size: 0.85rem; }
+            .whatsapp-btn .wlabel .small { display: none; }
         }
         @media (max-width: 480px) {
+            .hero-left h1 { font-size: 2rem; }
             .hero-stats-row { flex-wrap: wrap; gap: 1rem; }
             .hero-right { padding: 1.5rem 1.2rem; }
             .testimonial-grid { grid-template-columns: 1fr; }
-            .hero-left h1 { font-size: 2rem; }
             .nav-brand { font-size: 1.2rem; }
             .nav-card { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
-            .feature-card .card-left {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.8rem;
-            }
-            .feature-card .stat-row {
-                flex-wrap: wrap;
-                gap: 0.8rem;
-            }
+            .feature-card .card-left { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+            .feature-card .stat-row { flex-wrap: wrap; gap: 0.8rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ticker-track { animation: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- RISK BANNER -->
-    <div class="risk-banner">
-        <strong>Risk warning:</strong> 78.48% of retail investors lose money when trading CFDs with this provider.
-        <span class="highlight">Ensure you understand the risks.</span>
+<!-- RISK BANNER -->
+<div class="risk-banner">
+    <strong>Risk warning:</strong> 78.48% of retail investors lose money when trading CFDs with this provider.
+    <span class="highlight">Ensure you understand the risks.</span>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="nav-brand">
+        <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+        INVESTDESK
+    </a>
+    <div class="nav-cards">
+        <a href="#trade-card"    class="nav-card"><span>📈</span> Trade</a>
+        <a href="#markets-card"  class="nav-card"><span>🌍</span> Markets</a>
+        <a href="#platform-card" class="nav-card"><span>⚙️</span> Platform</a>
+        <a href="#pricing-card"  class="nav-card"><span>💰</span> Pricing</a>
+        <button class="nav-card outline" id="loginNavBtn"><span>🔑</span> Log in</button>
+        <button class="nav-card primary" id="getStartedBtn"><span>🚀</span> Get started</button>
     </div>
+</nav>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="nav-brand">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-            INVESTDESK
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ─────────────── HERO ─────────────── -->
+<div class="hero-wrapper">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero">
+
+        <!-- Ticker -->
+        <div class="ticker-wrap" aria-hidden="true">
+            <div class="ticker-track">
+                <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
+                <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
+                <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
+                <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
+                <span class="item"><span class="sym">MSFT</span> $415.10 <span class="dn">▼ 0.2%</span></span>
+                <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
+                <!-- duplicate for seamless scroll -->
+                <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
+                <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
+                <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
+                <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
+                <span class="item"><span class="sym">MSFT</span> $415.10 <span class="dn">▼ 0.2%</span></span>
+                <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
+            </div>
         </div>
-        <div class="nav-cards">
-            <a href="#trade-card" class="nav-card"><span class="icon">📈</span> Trade</a>
-            <a href="#markets-card" class="nav-card"><span class="icon">🌍</span> Markets</a>
-            <a href="#platform-card" class="nav-card"><span class="icon">⚙️</span> Platform</a>
-            <a href="#pricing-card" class="nav-card"><span class="icon">💰</span> Pricing</a>
-            <a href="#" class="nav-card outline" id="loginNavBtn"><span class="icon">🔑</span> Log in</a>
-            <a href="#" class="nav-card primary" id="getStartedBtn"><span class="icon">🚀</span> Get started</a>
+
+        <!-- Left copy -->
+        <div class="hero-left">
+            <div class="hero-badge">🔹 Live charts · Real-time data</div>
+            <h1>Global <span class="highlight">CFD</span> trading<br>5500+ instruments</h1>
+            <p class="sub">Trade stocks, crypto, indices, commodities &amp; more on a transparent, low-cost platform built for every device.</p>
+            <div class="hero-stats-row">
+                <div class="stat"><div class="num">5500+</div><div class="lbl">Markets</div></div>
+                <div class="stat"><div class="num">$0</div><div class="lbl">Deposit fees</div></div>
+                <div class="stat"><div class="num">24/7</div><div class="lbl">Support</div></div>
+            </div>
         </div>
-    </nav>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
+        <!-- Auth card -->
+        <div class="hero-right" id="authCard">
+            <div class="card-title">Start Trading</div>
+            <div class="card-sub">Create your account in 2 minutes</div>
 
-    <!-- ===== HERO ===== -->
-    <div class="hero-wrapper">
-        <div class="hero-bg"></div>
-        <div class="hero">
-            <div class="ticker-wrap">
-                <div class="ticker-track">
-                    <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
-                    <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
-                    <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
-                    <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
-                    <span class="item"><span class="sym">MSFT</span> $415.10 <span class="down">▼ 0.2%</span></span>
-                    <span class="item"><span class="sym">VNQ</span> $89.70 <span class="up">▲ 0.3%</span></span>
-                    <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
-                    <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
-                    <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
-                    <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
-                    <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
-                    <span class="item"><span class="sym">MSFT</span> $415.10 <span class="down">▼ 0.2%</span></span>
-                    <span class="item"><span class="sym">VNQ</span> $89.70 <span class="up">▲ 0.3%</span></span>
-                    <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
-                </div>
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" data-tab="signin"   role="tab" aria-selected="true">Sign In</button>
+                <button class="tab-btn"         data-tab="register" role="tab" aria-selected="false">Register</button>
             </div>
 
-            <div class="hero-left">
-                <div class="hero-badge">🔹 Live charts · Real-time data</div>
-                <h1>Global <span class="highlight">CFD</span> trading<br />5500+ instruments</h1>
-                <p class="sub">Trade stocks, crypto, indices, commodities &amp; more on a transparent, low-cost platform built for every device.</p>
-                <div class="hero-stats-row">
-                    <div class="stat"><div class="num">5500+</div><div class="lbl">Markets</div></div>
-                    <div class="stat"><div class="num">0</div><div class="lbl">Deposit fees</div></div>
-                    <div class="stat"><div class="num">24/7</div><div class="lbl">Human investment</div></div>
+            <!-- ── SIGN IN ── -->
+            <div class="form-group active" id="signinForm" role="tabpanel">
+                <div class="server-error" id="loginServerError"></div>
+                <div class="field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required />
+                    <div class="field-error" id="loginEmailErr">Please enter a valid email.</div>
                 </div>
+                <div class="field">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+                    <div class="field-error" id="loginPasswordErr">Password is required.</div>
+                </div>
+                <button class="btn-full" id="loginBtn" type="button">
+                    <div class="btn-spinner"></div>
+                    <span class="btn-label">Sign In</span>
+                </button>
             </div>
 
-            <div class="hero-right" id="authCard">
-                <div class="card-title">Start Trading</div>
-                <div class="card-sub">Create your account in 2 minutes</div>
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="signin">Sign In</button>
-                    <button class="tab-btn" data-tab="register">Register</button>
+            <!-- ── REGISTER ── -->
+            <div class="form-group" id="registerForm" role="tabpanel">
+                <div class="server-error" id="registerServerError"></div>
+                <div class="field">
+                    <label for="regName">Full name</label>
+                    <input type="text" id="regName" placeholder="Alexandra Chen" autocomplete="name" required />
+                    <div class="field-error" id="regNameErr">Name is required.</div>
                 </div>
-                <div class="form-group active" id="signinForm">
-                    <form id="loginForm" novalidate>
-                        <div class="field">
-                            <label for="loginEmail">Email</label>
-                            <input type="email" id="loginEmail" placeholder="alex@fund.com" required />
-                            <div class="error-msg" id="loginEmailError">Valid email required.</div>
-                        </div>
-                        <div class="field">
-                            <label for="loginPassword">Password</label>
-                            <input type="password" id="loginPassword" placeholder="••••••••" required />
-                            <div class="error-msg" id="loginPasswordError">Password required.</div>
-                        </div>
-                        <button type="submit" class="btn-full" id="loginBtn">Sign In</button>
-                    </form>
-                    <div class="demo-hint">Demo: <span>demo@investdesk.com</span> / <span>demo123</span></div>
+                <div class="field">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" required />
+                    <div class="field-error" id="regEmailErr">Please enter a valid email.</div>
                 </div>
-                <div class="form-group" id="registerForm">
-                    <form id="registerFormEl" novalidate>
-                        <div class="field">
-                            <label for="regName">Full name</label>
-                            <input type="text" id="regName" placeholder="Alexandra Chen" required />
-                            <div class="error-msg" id="regNameError">Name required.</div>
-                        </div>
-                        <div class="field">
-                            <label for="regEmail">Email</label>
-                            <input type="email" id="regEmail" placeholder="alex@fund.com" required />
-                            <div class="error-msg" id="regEmailError">Valid email required.</div>
-                            <div class="error-msg" id="regEmailExistsError" style="display:none;">Email already registered.</div>
-                        </div>
-                        <div class="field">
-                            <label for="regPassword">Password</label>
-                            <input type="password" id="regPassword" placeholder="Min 6 characters" required />
-                            <div class="strength-bar"><div class="fill" id="strengthFill"></div></div>
-                            <span class="strength-text" id="strengthText">Password strength</span>
-                            <div class="error-msg" id="regPasswordError">Min 6 characters.</div>
-                        </div>
-                        <div class="field">
-                            <label for="regConfirm">Confirm password</label>
-                            <input type="password" id="regConfirm" placeholder="••••••••" required />
-                            <div class="error-msg" id="regConfirmError">Passwords must match.</div>
-                        </div>
-                        <button type="submit" class="btn-full" id="registerBtn">Create Account</button>
-                    </form>
+                <div class="field">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters" autocomplete="new-password" required />
+                    <div class="strength-bar"><div class="fill" id="strengthFill"></div></div>
+                    <span class="strength-text" id="strengthText">Password strength</span>
+                    <div class="field-error" id="regPasswordErr">At least 6 characters required.</div>
                 </div>
+                <div class="field">
+                    <label for="regConfirm">Confirm password</label>
+                    <input type="password" id="regConfirm" placeholder="••••••••" autocomplete="new-password" required />
+                    <div class="field-error" id="regConfirmErr">Passwords must match.</div>
+                </div>
+                <button class="btn-full" id="registerBtn" type="button">
+                    <div class="btn-spinner"></div>
+                    <span class="btn-label">Create Account</span>
+                </button>
+            </div>
+        </div><!-- /hero-right -->
+
+    </div>
+</div>
+
+<!-- ─────────────── FEATURES ─────────────── -->
+<section class="features-section" id="featuresSection">
+    <div class="section-label">Different pages, <span style="color:#2563eb">one system</span></div>
+    <div class="section-sub">Multi-platform, all markets, any device. Built for you.</div>
+    <div class="features-grid">
+        <div class="feature-card" id="trade-card">
+            <div class="card-left">
+                <span class="icon">📈</span>
+                <div class="card-content">
+                    <h3>Trade</h3>
+                    <div class="desc">Spot, futures &amp; options. Advanced order types, trailing stops, real-time P&amp;L. Access 5500+ global markets with ultra-low latency execution and deep liquidity.</div>
+                </div>
+            </div>
+            <div class="card-right">
+                <div class="stat-row"><span><strong>0.0</strong> spread</span><span><strong>1:30</strong> leverage</span></div>
+                <span class="badge">Instant execution</span>
+            </div>
+        </div>
+        <div class="feature-card" id="markets-card">
+            <div class="card-left">
+                <span class="icon">🌍</span>
+                <div class="card-content">
+                    <h3>Markets</h3>
+                    <div class="desc">5500+ instruments: indices, FX, crypto, commodities, shares &amp; ETFs. Trade on 70+ exchanges worldwide with 24/7 crypto access and institutional-grade liquidity.</div>
+                </div>
+            </div>
+            <div class="card-right">
+                <div class="stat-row"><span><strong>24/7</strong> crypto</span><span><strong>70+</strong> exchanges</span></div>
+                <span class="badge">Deep liquidity</span>
+            </div>
+        </div>
+        <div class="feature-card" id="platform-card">
+            <div class="card-left">
+                <span class="icon">⚙️</span>
+                <div class="card-content">
+                    <h3>Platform</h3>
+                    <div class="desc">Web, mobile, API. Advanced charting with 50+ indicators, real-time alerts, comprehensive risk management tools, and detailed portfolio analytics.</div>
+                </div>
+            </div>
+            <div class="card-right">
+                <div class="stat-row"><span><strong>50+</strong> indicators</span><span><strong>10</strong> timeframes</span></div>
+                <span class="badge">Custom dashboards</span>
+            </div>
+        </div>
+        <div class="feature-card" id="pricing-card">
+            <div class="card-left">
+                <span class="icon">💰</span>
+                <div class="card-content">
+                    <h3>Pricing</h3>
+                    <div class="desc">Transparent fees, zero deposit fees, low commissions &amp; competitive spreads. No hidden costs, no account maintenance fees, and 0.1% withdrawal fee.</div>
+                </div>
+            </div>
+            <div class="card-right">
+                <div class="stat-row"><span><strong>$0</strong> deposit</span><span><strong>0.1%</strong> withdrawal</span></div>
+                <span class="badge">No hidden costs</span>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- ===== FEATURES SECTION - FULL WIDTH CARDS ===== -->
-    <section class="features-section" id="featuresSection">
-        <div class="section-label">Different pages, <span style="color: #2563eb;">one system</span></div>
-        <div class="section-sub">Multi-platform, all markets, any device. Built for you.</div>
-        <div class="features-grid">
-            <!-- 📈 Trade -->
-            <div class="feature-card" id="trade-card">
-                <div class="card-left">
-                    <span class="icon">📈</span>
-                    <div class="card-content">
-                        <h3>Trade</h3>
-                        <div class="desc">Spot, futures &amp; options. Advanced order types, trailing stops, real-time P&amp;L. Access 5500+ global markets with ultra-low latency execution and deep liquidity.</div>
-                    </div>
-                </div>
-                <div class="card-right">
-                    <div class="stat-row">
-                        <span><strong>0.0</strong> spread</span>
-                        <span><strong>1:30</strong> leverage</span>
-                    </div>
-                    <span class="badge">Instant execution</span>
-                </div>
+<!-- ─────────────── CHARTS ─────────────── -->
+<section class="charts-section" id="chartsSection">
+    <div class="section-label">Live <span style="color:#2563eb">market</span> data</div>
+    <div class="section-sub">Simulated price action — sign in for live portfolio data</div>
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="name">₿ BTC/USD</span>
+                <span><span class="price" id="btcPrice">$62,450</span>&nbsp;<span class="change up" id="btcChange">+1.8%</span></span>
             </div>
-            <!-- 🌍 Markets -->
-            <div class="feature-card" id="markets-card">
-                <div class="card-left">
-                    <span class="icon">🌍</span>
-                    <div class="card-content">
-                        <h3>Markets</h3>
-                        <div class="desc">5500+ instruments: indices, FX, crypto, commodities, shares &amp; ETFs. Trade on 70+ exchanges worldwide with 24/7 crypto access and institutional-grade liquidity.</div>
-                    </div>
-                </div>
-                <div class="card-right">
-                    <div class="stat-row">
-                        <span><strong>24/7</strong> crypto</span>
-                        <span><strong>70+</strong> exchanges</span>
-                    </div>
-                    <span class="badge">Deep liquidity</span>
-                </div>
-            </div>
-            <!-- ⚙️ Platform -->
-            <div class="feature-card" id="platform-card">
-                <div class="card-left">
-                    <span class="icon">⚙️</span>
-                    <div class="card-content">
-                        <h3>Platform</h3>
-                        <div class="desc">Web, mobile, API. Advanced charting with 50+ indicators, real-time alerts, comprehensive risk management tools, and detailed portfolio analytics.</div>
-                    </div>
-                </div>
-                <div class="card-right">
-                    <div class="stat-row">
-                        <span><strong>50+</strong> indicators</span>
-                        <span><strong>10</strong> timeframes</span>
-                    </div>
-                    <span class="badge">Custom dashboards</span>
-                </div>
-            </div>
-            <!-- 💰 Pricing -->
-            <div class="feature-card" id="pricing-card">
-                <div class="card-left">
-                    <span class="icon">💰</span>
-                    <div class="card-content">
-                        <h3>Pricing</h3>
-                        <div class="desc">Transparent fees, zero deposit fees, low commissions &amp; competitive spreads. No hidden costs, no account maintenance fees, and 0.1% withdrawal fee.</div>
-                    </div>
-                </div>
-                <div class="card-right">
-                    <div class="stat-row">
-                        <span><strong>$0</strong> deposit</span>
-                        <span><strong>0.1%</strong> withdrawal</span>
-                    </div>
-                    <span class="badge">No hidden costs</span>
-                </div>
-            </div>
+            <div class="chart-container"><canvas id="btcChart"></canvas></div>
         </div>
-    </section>
-
-    <!-- ===== LIVE CHARTS SECTION - TRADING STYLE ===== -->
-    <section class="charts-section" id="chartsSection">
-        <div class="section-label">Live <span style="color: #2563eb;">market</span> data</div>
-        <div class="section-sub">Real-time price action for the top 3 instruments</div>
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <span class="name">₿ BTC/USD</span>
-                    <span><span class="price" id="btcPrice">$62,450</span> <span class="change up" id="btcChange">+1.8%</span></span>
-                </div>
-                <div class="chart-container"><canvas id="btcChart"></canvas></div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="name">🍎 AAPL</span>
+                <span><span class="price" id="aaplPrice">$178.20</span>&nbsp;<span class="change up" id="aaplChange">+0.6%</span></span>
             </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <span class="name">🍎 AAPL</span>
-                    <span><span class="price" id="aaplPrice">$178.20</span> <span class="change up" id="aaplChange">+0.6%</span></span>
-                </div>
-                <div class="chart-container"><canvas id="aaplChart"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <span class="name">🚗 TSLA</span>
-                    <span><span class="price" id="tslaPrice">$243.50</span> <span class="change up" id="tslaChange">+1.2%</span></span>
-                </div>
-                <div class="chart-container"><canvas id="tslaChart"></canvas></div>
-            </div>
+            <div class="chart-container"><canvas id="aaplChart"></canvas></div>
         </div>
-    </section>
-
-    <!-- ===== CONTACT SECTION ===== -->
-    <section class="contact-section" id="contactSection">
-        <div class="section-label">Get in <span style="color: #2563eb;">touch</span></div>
-        <div class="section-sub">We're here to help you 24/7</div>
-        <div class="contact-grid">
-            <div class="contact-item">
-                <div class="icon">📧</div>
-                <div class="info">
-                    <span class="label">Email</span>
-                    <span class="value"><a href="mailto:investmentgroupofcompany37@gmail.com">investmentgroupofcompany37@gmail.com</a></span>
-                </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="name">🚗 TSLA</span>
+                <span><span class="price" id="tslaPrice">$243.50</span>&nbsp;<span class="change up" id="tslaChange">+1.2%</span></span>
             </div>
-            <div class="contact-item">
-                <div class="icon">📱</div>
-                <div class="info">
-                    <span class="label">WhatsApp</span>
-                    <span class="value"><a href="https://wa.me/16693627747" target="_blank">+1 669 362 7747</a></span>
-                </div>
-            </div>
-            <div class="contact-item">
-                <div class="icon">📞</div>
-                <div class="info">
-                    <span class="label">Phone</span>
-                    <span class="value"><a href="tel:+16693627747">+1 669 362 7747</a></span>
-                </div>
-            </div>
+            <div class="chart-container"><canvas id="tslaChart"></canvas></div>
         </div>
-    </section>
-
-    <!-- ===== TESTIMONIALS ===== -->
-    <section class="testimonials-section">
-        <div class="section-label">What our <span style="color: #2563eb;">Investors</span> say</div>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <div class="person">
-                    <img class="avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah" />
-                    <div><div class="name">Sarah Kaur</div><div class="role">Angel Investor</div></div>
-                </div>
-                <div class="stars">★★★★★</div>
-                <div class="quote">"The platform is intuitive. I love the live data and the clean interface."</div>
-                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="person">
-                    <img class="avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="David" />
-                    <div><div class="name">David Roth</div><div class="role">Tech Founder</div></div>
-                </div>
-                <div class="stars">★★★★★</div>
-                <div class="quote">"Transparent fees and great execution. I've recommended it to my entire network."</div>
-                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="person">
-                    <img class="avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Elena" />
-                    <div><div class="name">Elena Marchetti</div><div class="role">Portfolio Manager</div></div>
-                </div>
-                <div class="stars">★★★★★</div>
-                <div class="quote">"A beautiful dashboard with real depth. The risk tools are exactly what I need."</div>
-                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="person">
-                    <img class="avatar" src="https://randomuser.me/api/portraits/men/46.jpg" alt="James" />
-                    <div><div class="name">James Okafor</div><div class="role">Financial Advisor</div></div>
-                </div>
-                <div class="stars">★★★★★</div>
-                <div class="quote">"My clients love the clarity. It's become an essential part of my advisory workflow."</div>
-                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== WHATSAPP CHAT BUTTON ===== -->
-    <div class="whatsapp-chat">
-        <a href="https://wa.me/16693627747" target="_blank" class="whatsapp-btn" id="whatsappBtn">
-            <span class="icon">💬</span>
-            <span class="label">
-                <span>Chat with us</span>
-                <span class="small">We reply in minutes</span>
-            </span>
-        </a>
     </div>
+</section>
 
-    <!-- ===== RISK FOOTER ===== -->
-    <footer class="risk-footer">
-        <p>
-            <strong>Risk warning:</strong> CFDs are complex instruments and come with a high risk of losing money rapidly due to leverage.
-            <span class="highlight">78.48% of retail investors lose money</span> when trading CFDs with this provider.
-            You should consider whether you understand how CFDs work and whether you can afford to take the high risk of losing your money.
-        </p>
-        <p style="margin-top: 0.8rem; color: #94a3b8;">
-            InvestDesk is a trading name of Capital Com Online Investments Ltd, regulated by the SCB (License SIA-F245).
-            © 2026 InvestDesk. All rights reserved.
-        </p>
-    </footer>
+<!-- ─────────────── CONTACT ─────────────── -->
+<section class="contact-section" id="contactSection">
+    <div class="section-label">Get in <span style="color:#2563eb">touch</span></div>
+    <div class="section-sub">We're here to help you 24/7</div>
+    <div class="contact-grid">
+        <div class="contact-item">
+            <div class="icon">📧</div>
+            <div class="info">
+                <span class="label">Email</span>
+                <span class="value"><a href="mailto:investmentgroupofcompany37@gmail.com">investmentgroupofcompany37@gmail.com</a></span>
+            </div>
+        </div>
+        <div class="contact-item">
+            <div class="icon">📱</div>
+            <div class="info">
+                <span class="label">WhatsApp</span>
+                <span class="value"><a href="https://wa.me/16693627747" target="_blank" rel="noopener">+1 669 362 7747</a></span>
+            </div>
+        </div>
+        <div class="contact-item">
+            <div class="icon">📞</div>
+            <div class="info">
+                <span class="label">Phone</span>
+                <span class="value"><a href="tel:+16693627747">+1 669 362 7747</a></span>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <script>
-        (function() {
-            const toast = document.getElementById('toast');
-            let toastTimer = null;
-            function showToast(msg, type = 'success') {
-                if (toastTimer) clearTimeout(toastTimer);
-                toast.textContent = msg;
-                toast.className = 'toast ' + type + ' show';
-                toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+<!-- ─────────────── TESTIMONIALS ─────────────── -->
+<section class="testimonials-section">
+    <div class="section-label">What our <span style="color:#2563eb">Investors</span> say</div>
+    <div class="testimonial-grid">
+        <div class="testimonial-card">
+            <div class="person">
+                <img class="avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Kaur" loading="lazy" />
+                <div><div class="name">Sarah Kaur</div><div class="role">Angel Investor</div></div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <div class="quote">"The platform is intuitive. I love the live data and the clean interface."</div>
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="person">
+                <img class="avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="David Roth" loading="lazy" />
+                <div><div class="name">David Roth</div><div class="role">Tech Founder</div></div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <div class="quote">"Transparent fees and great execution. I've recommended it to my entire network."</div>
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="person">
+                <img class="avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Elena Marchetti" loading="lazy" />
+                <div><div class="name">Elena Marchetti</div><div class="role">Portfolio Manager</div></div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <div class="quote">"A beautiful dashboard with real depth. The risk tools are exactly what I need."</div>
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="person">
+                <img class="avatar" src="https://randomuser.me/api/portraits/men/46.jpg" alt="James Okafor" loading="lazy" />
+                <div><div class="name">James Okafor</div><div class="role">Financial Advisor</div></div>
+            </div>
+            <div class="stars">★★★★★</div>
+            <div class="quote">"My clients love the clarity. It's become an essential part of my advisory workflow."</div>
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+        </div>
+    </div>
+</section>
+
+<!-- WHATSAPP -->
+<div class="whatsapp-chat">
+    <a href="https://wa.me/16693627747" target="_blank" rel="noopener" class="whatsapp-btn">
+        <span class="wicon">💬</span>
+        <span class="wlabel">
+            <span>Chat with us</span>
+            <span class="small">We reply in minutes</span>
+        </span>
+    </a>
+</div>
+
+<!-- FOOTER -->
+<footer class="risk-footer">
+    <p>
+        <strong>Risk warning:</strong> CFDs are complex instruments and come with a high risk of losing money rapidly due to leverage.
+        <span class="highlight">78.48% of retail investors lose money</span> when trading CFDs with this provider.
+        You should consider whether you understand how CFDs work and whether you can afford to take the high risk of losing your money.
+    </p>
+    <p style="margin-top:0.8rem;color:#94a3b8;">
+        InvestDesk is a trading name of Capital Com Online Investments Ltd, regulated by the SCB (License SIA-F245).
+        © 2026 InvestDesk. All rights reserved.
+    </p>
+</footer>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    const toastEl = document.getElementById('toast');
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+        if (toastTimer) clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.className = 'toast ' + type + ' show';
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3500);
+    }
+
+    /* ============================================================
+       NAV SMOOTH SCROLL TO FEATURE CARDS
+    ============================================================ */
+    document.querySelectorAll('.nav-card[href^="#"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
+            document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('highlight-card'));
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('highlight-card');
+            setTimeout(() => target.classList.remove('highlight-card'), 2000);
+        });
+    });
+
+    /* ============================================================
+       NAV LOGIN / GET-STARTED BUTTONS
+    ============================================================ */
+    function scrollToTab(tab) {
+        document.getElementById('authCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.querySelector(`.tab-btn[data-tab="${tab}"]`).click();
+    }
+    document.getElementById('loginNavBtn').addEventListener('click', () => scrollToTab('signin'));
+    document.getElementById('getStartedBtn').addEventListener('click', () => scrollToTab('register'));
+
+    /* ============================================================
+       TABS
+    ============================================================ */
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = { signin: document.getElementById('signinForm'), register: document.getElementById('registerForm') };
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            tabBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+            this.classList.add('active'); this.setAttribute('aria-selected', 'true');
+            const target = this.dataset.tab;
+            Object.entries(tabPanels).forEach(([key, panel]) => panel.classList.toggle('active', key === target));
+            // clear all errors when switching
+            document.querySelectorAll('.field input').forEach(i => i.classList.remove('is-error','is-ok'));
+            document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.server-error').forEach(e => e.classList.remove('show'));
+        });
+    });
+
+    /* ============================================================
+       FIELD HELPERS
+    ============================================================ */
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function setError(input, errEl, msg) {
+        input.classList.add('is-error'); input.classList.remove('is-ok');
+        if (msg) errEl.textContent = msg;
+        errEl.classList.add('show');
+    }
+    function clearError(input, errEl) {
+        input.classList.remove('is-error'); input.classList.remove('is-ok');
+        errEl.classList.remove('show');
+    }
+    function setOk(input, errEl) {
+        input.classList.remove('is-error'); input.classList.add('is-ok');
+        errEl.classList.remove('show');
+    }
+    function showServerError(errEl, msg) { errEl.textContent = msg; errEl.classList.add('show'); }
+    function hideServerError(errEl) { errEl.classList.remove('show'); }
+
+    function setLoading(btn, loading) {
+        btn.disabled = loading;
+        btn.classList.toggle('loading', loading);
+    }
+
+    /* ============================================================
+       API HELPERS
+    ============================================================ */
+    async function apiPost(path, body) {
+        const res = await fetch(path, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json().catch(() => ({}));
+        return { ok: res.ok, status: res.status, data };
+    }
+
+    /* ============================================================
+       PASSWORD STRENGTH
+    ============================================================ */
+    const regPassword = document.getElementById('regPassword');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+
+    regPassword.addEventListener('input', function () {
+        const pwd = this.value;
+        if (!pwd) {
+            strengthFill.style.width = '0%'; strengthFill.style.background = '#e2e8f0';
+            strengthText.textContent = 'Password strength'; strengthText.style.color = '#64748b';
+            return;
+        }
+        let score = 0;
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 10) score++;
+        if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
+        if (/\d/.test(pwd)) score++;
+        if (/[^a-zA-Z0-9]/.test(pwd)) score++;
+        const levels = [
+            { width: '20%', color: '#ef4444', label: 'Too weak' },
+            { width: '40%', color: '#f97316', label: 'Weak' },
+            { width: '60%', color: '#f59e0b', label: 'Fair' },
+            { width: '80%', color: '#3b82f6', label: 'Good' },
+            { width: '100%', color: '#22c55e', label: 'Strong' },
+        ];
+        const lvl = levels[Math.min(score, 4)];
+        strengthFill.style.width = lvl.width; strengthFill.style.background = lvl.color;
+        strengthText.textContent = lvl.label; strengthText.style.color = lvl.color;
+    });
+
+    /* ============================================================
+       SIGN IN — calls /api/login
+    ============================================================ */
+    const loginBtn       = document.getElementById('loginBtn');
+    const loginEmail     = document.getElementById('loginEmail');
+    const loginPassword  = document.getElementById('loginPassword');
+    const loginEmailErr  = document.getElementById('loginEmailErr');
+    const loginPassErr   = document.getElementById('loginPasswordErr');
+    const loginSrvErr    = document.getElementById('loginServerError');
+
+    // Live validation
+    loginEmail.addEventListener('blur', () => {
+        if (!loginEmail.value.trim()) return;
+        validateEmail(loginEmail.value.trim())
+            ? setOk(loginEmail, loginEmailErr)
+            : setError(loginEmail, loginEmailErr, 'Please enter a valid email.');
+    });
+    loginPassword.addEventListener('blur', () => {
+        loginPassword.value.trim()
+            ? setOk(loginPassword, loginPassErr)
+            : setError(loginPassword, loginPassErr, 'Password is required.');
+    });
+
+    loginBtn.addEventListener('click', async () => {
+        hideServerError(loginSrvErr);
+        const email    = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+        let valid = true;
+
+        if (!validateEmail(email)) { setError(loginEmail, loginEmailErr, 'Please enter a valid email.'); valid = false; }
+        else clearError(loginEmail, loginEmailErr);
+
+        if (!password) { setError(loginPassword, loginPassErr, 'Password is required.'); valid = false; }
+        else clearError(loginPassword, loginPassErr);
+
+        if (!valid) return;
+
+        setLoading(loginBtn, true);
+        try {
+            const { ok, data } = await apiPost('/api/login', { email, password });
+            if (ok) {
+                showToast('✅ Welcome back, ' + data.user.name + '!', 'success');
+                setTimeout(() => { window.location.href = '/dashboard'; }, 600);
+            } else {
+                showServerError(loginSrvErr, data.error || 'Invalid email or password.');
+                loginPassword.value = '';
+                loginPassword.focus();
+                setLoading(loginBtn, false);
+            }
+        } catch {
+            showServerError(loginSrvErr, 'Network error — please try again.');
+            setLoading(loginBtn, false);
+        }
+    });
+
+    // Allow Enter key in password field to submit
+    loginPassword.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+    loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPassword.focus(); });
+
+    /* ============================================================
+       REGISTER — calls /api/register then /api/login
+    ============================================================ */
+    const registerBtn  = document.getElementById('registerBtn');
+    const regName      = document.getElementById('regName');
+    const regEmail     = document.getElementById('regEmail');
+    const regConfirm   = document.getElementById('regConfirm');
+    const regNameErr   = document.getElementById('regNameErr');
+    const regEmailErr  = document.getElementById('regEmailErr');
+    const regPassErr   = document.getElementById('regPasswordErr');
+    const regConfirmErr= document.getElementById('regConfirmErr');
+    const regSrvErr    = document.getElementById('registerServerError');
+
+    // Live validation on blur
+    regName.addEventListener('blur',    () => regName.value.trim()         ? setOk(regName, regNameErr)       : setError(regName, regNameErr, 'Name is required.'));
+    regEmail.addEventListener('blur',   () => validateEmail(regEmail.value.trim()) ? setOk(regEmail, regEmailErr)     : setError(regEmail, regEmailErr, 'Please enter a valid email.'));
+    regPassword.addEventListener('blur',() => regPassword.value.length >= 6? setOk(regPassword, regPassErr)   : setError(regPassword, regPassErr, 'At least 6 characters required.'));
+    regConfirm.addEventListener('blur', () => {
+        if (!regConfirm.value) { setError(regConfirm, regConfirmErr, 'Please confirm your password.'); return; }
+        regConfirm.value === regPassword.value
+            ? setOk(regConfirm, regConfirmErr)
+            : setError(regConfirm, regConfirmErr, 'Passwords must match.');
+    });
+
+    registerBtn.addEventListener('click', async () => {
+        hideServerError(regSrvErr);
+        const name     = regName.value.trim();
+        const email    = regEmail.value.trim();
+        const password = regPassword.value;
+        const confirm  = regConfirm.value;
+        let valid = true;
+
+        if (!name)                    { setError(regName,    regNameErr,    'Name is required.');             valid = false; } else clearError(regName, regNameErr);
+        if (!validateEmail(email))    { setError(regEmail,   regEmailErr,   'Please enter a valid email.');   valid = false; } else clearError(regEmail, regEmailErr);
+        if (password.length < 6)      { setError(regPassword,regPassErr,    'At least 6 characters required.');valid=false;  } else clearError(regPassword, regPassErr);
+        if (password !== confirm || !confirm) { setError(regConfirm, regConfirmErr, 'Passwords must match.'); valid = false; } else clearError(regConfirm, regConfirmErr);
+
+        if (!valid) return;
+
+        setLoading(registerBtn, true);
+        try {
+            // 1. Register
+            const { ok: regOk, data: regData } = await apiPost('/api/register', { name, email, password });
+            if (!regOk) {
+                showServerError(regSrvErr, regData.error || 'Registration failed.');
+                if (regData.error && regData.error.toLowerCase().includes('email')) {
+                    setError(regEmail, regEmailErr, regData.error);
+                }
+                setLoading(registerBtn, false);
+                return;
             }
 
-            // ============================================================
-            // NAV CARD SCROLL
-            // ============================================================
-            document.querySelectorAll('.nav-card[href^="#"]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetEl = document.querySelector(targetId);
-                    if (targetEl) {
-                        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('highlight-card'));
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        targetEl.classList.add('highlight-card');
-                        setTimeout(() => targetEl.classList.remove('highlight-card'), 2000);
+            // 2. Auto-login after successful registration
+            const { ok: loginOk, data: loginData } = await apiPost('/api/login', { email, password });
+            if (loginOk) {
+                showToast('✅ Welcome to InvestDesk, ' + name + '!', 'success');
+                setTimeout(() => { window.location.href = '/dashboard'; }, 700);
+            } else {
+                // Registered but login failed for some reason — send to signin tab
+                showToast('Account created! Please sign in.', 'success');
+                document.querySelector('.tab-btn[data-tab="signin"]').click();
+                loginEmail.value = email;
+                loginPassword.focus();
+                setLoading(registerBtn, false);
+            }
+        } catch {
+            showServerError(regSrvErr, 'Network error — please try again.');
+            setLoading(registerBtn, false);
+        }
+    });
+
+    // Enter key in last field submits
+    regConfirm.addEventListener('keydown', e => { if (e.key === 'Enter') registerBtn.click(); });
+
+    /* ============================================================
+       SESSION CHECK — redirect to /dashboard if already logged in
+       Checks the server rather than localStorage
+    ============================================================ */
+    (async function checkSession() {
+        try {
+            const res = await fetch('/api/investments', { credentials: 'same-origin' });
+            // A 200 means the session cookie is valid — user is logged in
+            if (res.ok) { window.location.replace('/dashboard'); }
+        } catch { /* offline or server down — stay on page */ }
+    })();
+
+    /* ============================================================
+       LIVE CHARTS (simulated — illustrative only)
+    ============================================================ */
+    function genData(base, vol, points) {
+        const out = []; let cur = base;
+        for (let i = 0; i < points; i++) {
+            cur = Math.max(cur * (1 + (Math.random() - 0.5) * vol / 100), base * 0.5);
+            out.push(cur);
+        }
+        return out;
+    }
+
+    const chartDefs = [
+        { id: 'btcChart',  label: 'BTC',  base: 62450,  vol: 2.0, priceId: 'btcPrice',  changeId: 'btcChange',  color: '#F7931A' },
+        { id: 'aaplChart', label: 'AAPL', base: 178.20, vol: 1.5, priceId: 'aaplPrice', changeId: 'aaplChange', color: '#A2AAAD' },
+        { id: 'tslaChart', label: 'TSLA', base: 243.50, vol: 2.5, priceId: 'tslaPrice', changeId: 'tslaChange', color: '#E82127' },
+    ];
+
+    const charts = {};
+    chartDefs.forEach(cfg => {
+        const ctx = document.getElementById(cfg.id).getContext('2d');
+        const data = genData(cfg.base, cfg.vol, 40);
+        const grad = ctx.createLinearGradient(0, 0, 0, 200);
+        grad.addColorStop(0, cfg.color + '40'); grad.addColorStop(1, cfg.color + '00');
+
+        charts[cfg.id] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map((_, i) => i),
+                datasets: [{ data, borderColor: cfg.color, backgroundColor: grad, fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0b1a2f', titleColor: '#e2e8f0', bodyColor: '#fff',
+                        borderColor: '#1e2d45', borderWidth: 1, cornerRadius: 8,
+                        callbacks: { label: ctx => '$' + ctx.parsed.y.toFixed(2) }
                     }
-                });
-            });
-
-            // ============================================================
-            // LOGIN / REGISTER NAV
-            // ============================================================
-            const loginNavBtn = document.getElementById('loginNavBtn');
-            const getStartedBtn = document.getElementById('getStartedBtn');
-            const authCard = document.getElementById('authCard');
-            if (loginNavBtn) {
-                loginNavBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    document.querySelector('.tab-btn[data-tab="signin"]').click();
-                });
+                },
+                scales: {
+                    x: { grid: { color: '#1e2d45' }, ticks: { display: false } },
+                    y: { grid: { color: '#1e2d45' }, ticks: { display: false } }
+                },
+                interaction: { intersect: false, mode: 'index' }
             }
-            if (getStartedBtn) {
-                getStartedBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    document.querySelector('.tab-btn[data-tab="register"]').click();
-                });
-            }
+        });
 
-            // ============================================================
-            // TABS
-            // ============================================================
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const forms = { signin: document.getElementById('signinForm'), register: document.getElementById('registerForm') };
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const target = this.dataset.tab;
-                    Object.keys(forms).forEach(key => forms[key].classList.toggle('active', key === target));
-                    document.querySelectorAll('.field input').forEach(inp => inp.classList.remove('error', 'success'));
-                    document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
-                    document.getElementById('regEmailExistsError').style.display = 'none';
-                });
-            });
+        function updateLabel(chartId, priceId, changeId, base) {
+            const d = charts[chartId].data.datasets[0].data;
+            const last = d[d.length - 1];
+            const pct  = (last - base) / base * 100;
+            document.getElementById(priceId).textContent = '$' + last.toFixed(2);
+            const el = document.getElementById(changeId);
+            el.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+            el.className = 'change ' + (pct >= 0 ? 'up' : 'dn');
+        }
+        updateLabel(cfg.id, cfg.priceId, cfg.changeId, cfg.base);
+    });
 
-            // ============================================================
-            // HELPERS
-            // ============================================================
-            function setFieldError(input, errEl, condition) {
-                if (condition) { input.classList.add('error'); input.classList.remove('success'); errEl.classList.add('show'); } 
-                else { input.classList.remove('error'); errEl.classList.remove('show'); }
-            }
-            function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    setInterval(() => {
+        chartDefs.forEach(cfg => {
+            const chart = charts[cfg.id];
+            const d = chart.data.datasets[0].data;
+            const last = d[d.length - 1];
+            const next = Math.max(last * (1 + (Math.random() - 0.5) * cfg.vol / 100 * 1.5), cfg.base * 0.4);
+            d.push(next); d.shift();
+            chart.update('none');
+            const pct = (next - cfg.base) / cfg.base * 100;
+            document.getElementById(cfg.priceId).textContent = '$' + next.toFixed(2);
+            const el = document.getElementById(cfg.changeId);
+            el.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+            el.className = 'change ' + (pct >= 0 ? 'up' : 'dn');
+        });
+    }, 2000);
 
-            // ============================================================
-            // PASSWORD STRENGTH
-            // ============================================================
-            const regPassword = document.getElementById('regPassword');
-            const strengthFill = document.getElementById('strengthFill');
-            const strengthText = document.getElementById('strengthText');
-            regPassword.addEventListener('input', function() {
-                const pwd = this.value;
-                let strength = 0;
-                if (pwd.length >= 6) strength++;
-                if (pwd.length >= 10) strength++;
-                if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) strength++;
-                if (/\d/.test(pwd)) strength++;
-                if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
-                if (pwd.length === 0) {
-                    strengthFill.style.width = '0%'; strengthFill.style.background = '#e2e8f0';
-                    strengthText.textContent = 'Password strength'; strengthText.style.color = '#64748b';
-                    return;
-                }
-                let width, color, label;
-                if (strength <= 1) { width = '25%'; color = '#ef4444'; label = 'Weak'; } 
-                else if (strength === 2) { width = '50%'; color = '#f59e0b'; label = 'Fair'; } 
-                else if (strength === 3) { width = '75%'; color = '#3b82f6'; label = 'Good'; } 
-                else { width = '100%'; color = '#22c55e'; label = 'Strong'; }
-                strengthFill.style.width = width; strengthFill.style.background = color;
-                strengthText.textContent = label; strengthText.style.color = color;
-            });
-
-            // ============================================================
-            // DEMO USERS - Fixed storage
-            // ============================================================
-            function getUsers() { 
-                try {
-                    const data = localStorage.getItem('investdesk_users'); 
-                    return data ? JSON.parse(data) : []; 
-                } catch(e) { return []; }
-            }
-            function saveUsers(users) { 
-                localStorage.setItem('investdesk_users', JSON.stringify(users)); 
-            }
-            
-            // Initialize with demo users if empty
-            if (getUsers().length === 0) {
-                saveUsers([
-                    { name: 'Demo User', email: 'demo@investdesk.com', password: 'demo123' },
-                    { name: 'Admin', email: 'admin@investdesk.com', password: 'admin123' }
-                ]);
-            }
-
-            // ============================================================
-            // LOGIN - Fixed to work properly
-            // ============================================================
-            const loginForm = document.getElementById('loginForm');
-            const loginEmail = document.getElementById('loginEmail');
-            const loginPassword = document.getElementById('loginPassword');
-            const loginEmailErr = document.getElementById('loginEmailError');
-            const loginPassErr = document.getElementById('loginPasswordError');
-            
-            // Pre-fill demo credentials
-            loginEmail.value = 'demo@investdesk.com';
-            loginPassword.value = 'demo123';
-            
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const email = loginEmail.value.trim();
-                const password = loginPassword.value.trim();
-                const emailOk = validateEmail(email);
-                const passOk = password.length > 0;
-                
-                // Validate inputs
-                setFieldError(loginEmail, loginEmailErr, !emailOk);
-                setFieldError(loginPassword, loginPassErr, !passOk);
-                
-                if (!emailOk || !passOk) {
-                    showToast('Please fix the errors.', 'error');
-                    return;
-                }
-                
-                // Show loading state
-                const btn = document.getElementById('loginBtn');
-                const originalText = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Signing in…';
-                
-                // Simulate network delay
-                setTimeout(() => {
-                    const users = getUsers();
-                    const user = users.find(u => u.email === email && u.password === password);
-                    
-                    if (user) {
-                        showToast('✅ Welcome back, ' + user.name + '!', 'success');
-                        sessionStorage.setItem('investdesk_user', JSON.stringify(user));
-                        
-                        // Redirect to dashboard after brief delay
-                        setTimeout(() => {
-                            window.location.href = '/dashboard';
-                        }, 600);
-                    } else {
-                        showToast('❌ Invalid email or password. Try demo@investdesk.com / demo123', 'error');
-                        btn.disabled = false;
-                        btn.textContent = originalText;
-                    }
-                }, 800);
-            });
-
-            // ============================================================
-            // REGISTER - Fixed to work properly
-            // ============================================================
-            const regForm = document.getElementById('registerFormEl');
-            const regName = document.getElementById('regName');
-            const regEmail = document.getElementById('regEmail');
-            const regConfirm = document.getElementById('regConfirm');
-            const regNameErr = document.getElementById('regNameError');
-            const regEmailErr = document.getElementById('regEmailError');
-            const regEmailExistsErr = document.getElementById('regEmailExistsError');
-            const regPassErr = document.getElementById('regPasswordError');
-            const regConfirmErr = document.getElementById('regConfirmError');
-            
-            regForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = regName.value.trim();
-                const email = regEmail.value.trim();
-                const password = regPassword.value.trim();
-                const confirm = regConfirm.value.trim();
-                
-                const nameOk = name.length > 0;
-                const emailOk = validateEmail(email);
-                const passOk = password.length >= 6;
-                const confirmOk = password === confirm && passOk;
-                
-                // Check if email exists
-                const users = getUsers();
-                const emailExists = users.some(u => u.email === email);
-                
-                // Validate all fields
-                setFieldError(regName, regNameErr, !nameOk);
-                setFieldError(regEmail, regEmailErr, !emailOk);
-                setFieldError(regPassword, regPassErr, !passOk);
-                setFieldError(regConfirm, regConfirmErr, !confirmOk);
-                
-                // Email exists validation
-                if (emailOk && emailExists) {
-                    regEmail.classList.add('error');
-                    regEmailExistsErr.style.display = 'block';
-                } else {
-                    regEmailExistsErr.style.display = 'none';
-                }
-                
-                // Check if any errors
-                if (!nameOk || !emailOk || !passOk || !confirmOk || emailExists) {
-                    showToast('Please fix the errors.', 'error');
-                    return;
-                }
-                
-                // Show loading state
-                const btn = document.getElementById('registerBtn');
-                const originalText = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Creating…';
-                
-                // Simulate network delay
-                setTimeout(() => {
-                    const newUser = { name, email, password };
-                    const updatedUsers = getUsers();
-                    updatedUsers.push(newUser);
-                    saveUsers(updatedUsers);
-                    
-                    // Store session
-                    sessionStorage.setItem('investdesk_user', JSON.stringify(newUser));
-                    showToast('✅ Account created! Welcome ' + name, 'success');
-                    
-                    // Redirect to dashboard
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 700);
-                }, 900);
-            });
-
-            // ============================================================
-            // LIVE CHARTS - TRADING STYLE
-            // ============================================================
-            function generateRandomData(base, volatility, points = 40) {
-                const data = [];
-                let current = base;
-                for (let i = 0; i < points; i++) {
-                    const change = (Math.random() - 0.5) * volatility * 2.5;
-                    current = Math.max(current * (1 + change / 100), base * 0.5);
-                    data.push(current);
-                }
-                return data;
-            }
-
-            const chartConfigs = [
-                { id: 'btcChart', label: 'BTC', base: 62450, vol: 2.0, priceId: 'btcPrice', changeId: 'btcChange', color: '#F7931A' },
-                { id: 'aaplChart', label: 'AAPL', base: 178.20, vol: 1.5, priceId: 'aaplPrice', changeId: 'aaplChange', color: '#A2AAAD' },
-                { id: 'tslaChart', label: 'TSLA', base: 243.50, vol: 2.5, priceId: 'tslaPrice', changeId: 'tslaChange', color: '#E82127' }
-            ];
-
-            const charts = {};
-            chartConfigs.forEach(cfg => {
-                const ctx = document.getElementById(cfg.id).getContext('2d');
-                const initialData = generateRandomData(cfg.base, cfg.vol, 40);
-                
-                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, cfg.color + '40');
-                gradient.addColorStop(1, cfg.color + '00');
-
-                charts[cfg.id] = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: Array.from({ length: 40 }, (_, i) => i + 1),
-                        datasets: [{
-                            label: cfg.label,
-                            data: initialData,
-                            borderColor: cfg.color,
-                            backgroundColor: gradient,
-                            fill: true,
-                            tension: 0.2,
-                            pointRadius: 0,
-                            borderWidth: 2,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#0b1a2f',
-                                titleColor: '#e2e8f0',
-                                bodyColor: '#ffffff',
-                                borderColor: '#1e2d45',
-                                borderWidth: 1,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return '$' + context.parsed.y.toFixed(2);
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { 
-                                grid: { color: '#1e2d45', display: true }, 
-                                ticks: { display: false } 
-                            },
-                            y: { 
-                                grid: { color: '#1e2d45', display: true }, 
-                                ticks: { 
-                                    display: false,
-                                    color: '#94a3b8'
-                                } 
-                            }
-                        },
-                        interaction: { intersect: false, mode: 'index' }
-                    }
-                });
-
-                const lastPrice = initialData[initialData.length - 1];
-                const change = ((lastPrice - cfg.base) / cfg.base * 100);
-                document.getElementById(cfg.priceId).textContent = '$' + lastPrice.toFixed(2);
-                const changeEl = document.getElementById(cfg.changeId);
-                changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
-                changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
-            });
-
-            // Update charts every 2 seconds
-            setInterval(() => {
-                chartConfigs.forEach(cfg => {
-                    const chart = charts[cfg.id];
-                    if (!chart) return;
-                    const data = chart.data.datasets[0].data;
-                    const last = data[data.length - 1];
-                    const change = (Math.random() - 0.5) * cfg.vol * 1.5;
-                    let newVal = last * (1 + change / 100);
-                    newVal = Math.max(newVal, cfg.base * 0.4);
-                    data.push(newVal);
-                    data.shift();
-                    chart.update('none');
-
-                    const lastPrice = data[data.length - 1];
-                    const changePercent = ((lastPrice - cfg.base) / cfg.base * 100);
-                    document.getElementById(cfg.priceId).textContent = '$' + lastPrice.toFixed(2);
-                    const changeEl = document.getElementById(cfg.changeId);
-                    changeEl.textContent = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(1) + '%';
-                    changeEl.className = 'change ' + (changePercent >= 0 ? 'up' : 'down');
-                });
-            }, 2000);
-
-            // ============================================================
-            // SESSION CHECK - Redirect if already logged in
-            // ============================================================
-            const existingUser = sessionStorage.getItem('investdesk_user');
-            if (existingUser && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
-                window.location.href = '/dashboard';
-            }
-        })();
-    </script>
-
+})();
+</script>
 </body>
-</html> v 
+</html>
