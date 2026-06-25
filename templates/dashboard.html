@@ -441,6 +441,34 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Error banner */
+    .error-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 0.85rem;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner .retry-btn {
+      background: #b91c1c;
+      color: white;
+      border: none;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+    }
+    .error-banner .retry-btn:hover { background: #991b1b; }
+
     @media (max-width:720px) {
       .rail { width:100%; border-right:none; border-bottom:1px solid rgba(0,0,0,0.06); }
       .summary-strip { grid-template-columns:repeat(3,1fr); }
@@ -504,6 +532,12 @@
             <span id="lastUpdated">Updated: Loading...</span>
           </div>
         </div>
+      </div>
+
+      <!-- Error banner -->
+      <div class="error-banner" id="errorBanner">
+        <span id="errorMessage">⚠️ Failed to load data</span>
+        <button class="retry-btn" id="retryBtn">🔄 Retry</button>
       </div>
 
       <div class="summary-strip">
@@ -580,6 +614,7 @@
       let currentUser = null;
       let refreshInterval = null;
       let investments = [];
+      let isRefreshing = false;
 
       // ----- Toast -----
       const toast = document.getElementById('toast');
@@ -592,19 +627,55 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
+      // ----- Error Banner -----
+      const errorBanner = document.getElementById('errorBanner');
+      const errorMessage = document.getElementById('errorMessage');
+
+      function showError(msg) {
+        errorMessage.textContent = '⚠️ ' + msg;
+        errorBanner.classList.add('show');
+      }
+
+      function hideError() {
+        errorBanner.classList.remove('show');
+      }
+
       // ----- Auth Check -----
-      function checkAuth() {
-        const userData = sessionStorage.getItem('investdesk_user');
-        if (!userData) {
+      async function checkAuth() {
+        try {
+          // First check session via API
+          const res = await fetch('/api/session', { 
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            if (data.logged_in && data.user) {
+              currentUser = data.user;
+              sessionStorage.setItem('investdesk_user', JSON.stringify(currentUser));
+              document.getElementById('currentUserLabel').textContent = 
+                currentUser.name + ' (' + currentUser.email + ')';
+              return true;
+            }
+          }
+          
+          // Fallback to sessionStorage
+          const userData = sessionStorage.getItem('investdesk_user');
+          if (userData) {
+            try {
+              currentUser = JSON.parse(userData);
+              document.getElementById('currentUserLabel').textContent = 
+                currentUser.name + ' (' + currentUser.email + ')';
+              return true;
+            } catch (e) {}
+          }
+          
+          // Not logged in
           window.location.href = '/';
           return false;
-        }
-        try {
-          currentUser = JSON.parse(userData);
-          document.getElementById('currentUserLabel').textContent = 
-            currentUser.name + ' (' + currentUser.email + ')';
-          return true;
         } catch (e) {
+          console.error('Auth check error:', e);
           window.location.href = '/';
           return false;
         }
@@ -628,7 +699,7 @@
               window.location.href = '/';
               return {};
             }
-            throw new Error('Failed to fetch prices');
+            throw new Error('Failed to fetch prices: ' + res.status);
           }
           const data = await res.json();
           return data.prices || {};
@@ -646,7 +717,7 @@
               window.location.href = '/';
               return [];
             }
-            throw new Error('Failed to fetch investments');
+            throw new Error('Failed to fetch investments: ' + res.status);
           }
           const data = await res.json();
           investments = data;
@@ -687,28 +758,34 @@
 
       // ----- Update UI -----
       async function updateAssetGrid() {
-        const prices = await fetchPrices();
-        const grid = document.getElementById('assetGrid');
-        grid.innerHTML = '';
+        try {
+          const prices = await fetchPrices();
+          const grid = document.getElementById('assetGrid');
+          grid.innerHTML = '';
 
-        if (Object.keys(prices).length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:2rem;">Loading prices...</div>';
-          return;
+          if (Object.keys(prices).length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:2rem;">No price data available</div>';
+            return;
+          }
+
+          Object.entries(prices).forEach(([symbol, data]) => {
+            const card = document.createElement('div');
+            card.className = 'asset-card';
+            const changeClass = data.change_pct >= 0 ? '#22c55e' : '#ef4444';
+            const changeArrow = data.change_pct >= 0 ? '▲' : '▼';
+            
+            card.innerHTML = `
+              <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>${symbol}</div>
+              <div class="price">$${data.price ? data.price.toFixed(2) : 'N/A'}</div>
+              <div class="chg" style="color:${changeClass};">${changeArrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</div>
+            `;
+            grid.appendChild(card);
+          });
+          hideError();
+        } catch (e) {
+          console.error('Error updating asset grid:', e);
+          showError('Failed to load price data');
         }
-
-        Object.entries(prices).forEach(([symbol, data]) => {
-          const card = document.createElement('div');
-          card.className = 'asset-card';
-          const changeClass = data.change_pct >= 0 ? '#22c55e' : '#ef4444';
-          const changeArrow = data.change_pct >= 0 ? '▲' : '▼';
-          
-          card.innerHTML = `
-            <div class="sym"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>${symbol}</div>
-            <div class="price">$${data.price ? data.price.toFixed(2) : 'N/A'}</div>
-            <div class="chg" style="color:${changeClass};">${changeArrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</div>
-          `;
-          grid.appendChild(card);
-        });
       }
 
       async function updateHoldings() {
@@ -771,45 +848,68 @@
           document.getElementById('lastUpdated').textContent = 
             'Updated: ' + now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) +
             ', ' + now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-            
+          
+          hideError();
         } catch (error) {
           console.error('Error updating holdings:', error);
+          showError('Failed to load investment data');
         }
       }
 
       async function updateTicker() {
-        const prices = await fetchPrices();
-        const track = document.getElementById('tickerTrack');
-        let html = '';
-        
-        if (Object.keys(prices).length === 0) {
-          track.innerHTML = '<div class="ticker-item">Loading prices...</div>';
-          return;
+        try {
+          const prices = await fetchPrices();
+          const track = document.getElementById('tickerTrack');
+          let html = '';
+          
+          if (Object.keys(prices).length === 0) {
+            track.innerHTML = '<div class="ticker-item">Loading prices...</div>';
+            return;
+          }
+          
+          Object.entries(prices).forEach(([symbol, data]) => {
+            const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
+            const arrow = data.change_pct >= 0 ? '▲' : '▼';
+            html += `
+              <div class="ticker-item">
+                <span class="sym">${symbol}</span> 
+                $${data.price ? data.price.toFixed(2) : 'N/A'} 
+                <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
+              </div>
+            `;
+          });
+          
+          track.innerHTML = html + html;
+        } catch (e) {
+          console.error('Error updating ticker:', e);
         }
-        
-        Object.entries(prices).forEach(([symbol, data]) => {
-          const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
-          const arrow = data.change_pct >= 0 ? '▲' : '▼';
-          html += `
-            <div class="ticker-item">
-              <span class="sym">${symbol}</span> 
-              $${data.price ? data.price.toFixed(2) : 'N/A'} 
-              <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
-            </div>
-          `;
-        });
-        
-        track.innerHTML = html + html;
       }
 
       // ----- Refresh all data -----
       async function refreshAll() {
-        await Promise.all([
-          updateTicker(),
-          updateAssetGrid(),
-          updateHoldings()
-        ]);
+        if (isRefreshing) return;
+        isRefreshing = true;
+        
+        try {
+          await Promise.all([
+            updateTicker(),
+            updateAssetGrid(),
+            updateHoldings()
+          ]);
+        } catch (e) {
+          console.error('Refresh error:', e);
+          showError('Failed to refresh data');
+        } finally {
+          isRefreshing = false;
+        }
       }
+
+      // ----- Retry button -----
+      document.getElementById('retryBtn').addEventListener('click', function() {
+        hideError();
+        refreshAll();
+        showToast('🔄 Retrying...', 'success');
+      });
 
       // ----- Create Investment Modal -----
       const overlay = document.getElementById('createModalOverlay');
@@ -822,7 +922,6 @@
 
       openBtn.addEventListener('click', () => {
         overlay.classList.remove('hidden');
-        // Pre-fill with current user's name and email as read-only
         document.getElementById('createSymbol').value = 'TSLA';
         document.getElementById('createShares').value = '';
         document.getElementById('createBuyPrice').value = '';
@@ -851,12 +950,10 @@
           return;
         }
         
-        // Show loading state
         submitBtn.disabled = true;
         submitText.textContent = 'Creating...';
         submitSpinner.classList.remove('hidden');
         
-        // Use the logged-in user's name and email from session
         const payload = {
           symbol: symbol,
           shares: shares,
@@ -894,7 +991,8 @@
 
       // ----- Initialize -----
       async function init() {
-        if (!checkAuth()) return;
+        const authenticated = await checkAuth();
+        if (!authenticated) return;
         
         document.getElementById('holdingsBody').innerHTML = 
           '<tr><td colspan="6" style="text-align:center;color:#64748b;padding:2rem;">Loading your investments...</td></tr>';
