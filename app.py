@@ -200,36 +200,16 @@ print("✅ Database initialization complete")
 
 
 # ---------------------------------------------------------------------------
-# Admin route to reset database
+# Auth helpers
 # ---------------------------------------------------------------------------
 
-@app.route("/api/admin/reset-db", methods=["POST"])
-@admin_required
-def reset_db_route():
-    """Admin route to reset the database"""
-    try:
-        if reset_database():
-            return jsonify({"ok": True, "message": "Database reset successfully"})
-        else:
-            return jsonify({"error": "Failed to reset database"}), 500
-    except Exception as e:
-        print(f"Error in reset_db_route: {e}")
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/admin/verify-db", methods=["GET"])
-@admin_required
-def verify_db_route():
-    """Admin route to verify database tables"""
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        tables = [row[0] for row in cursor.fetchall()]
-        conn.close()
-        return jsonify({"tables": tables, "ok": True})
-    except Exception as e:
-        return jsonify({"error": str(e), "ok": False}), 500
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not session.get("is_admin"):
+            return jsonify({"error": "Admin authentication required"}), 401
+        return fn(*args, **kwargs)
+    return wrapper
 
 
 # ---------------------------------------------------------------------------
@@ -279,19 +259,6 @@ def fetch_price(symbol):
     with PRICE_CACHE_LOCK:
         PRICE_CACHE[symbol] = result
     return result
-
-
-# ---------------------------------------------------------------------------
-# Auth helpers
-# ---------------------------------------------------------------------------
-
-def admin_required(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        if not session.get("is_admin"):
-            return jsonify({"error": "Admin authentication required"}), 401
-        return fn(*args, **kwargs)
-    return wrapper
 
 
 # ---------------------------------------------------------------------------
@@ -644,6 +611,35 @@ def admin_delete_investment(investment_id):
         print(f"Error in admin_delete_investment: {e}")
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/admin/reset-db", methods=["POST"])
+@admin_required
+def reset_db_route():
+    """Admin route to reset the database"""
+    try:
+        if reset_database():
+            return jsonify({"ok": True, "message": "Database reset successfully"})
+        else:
+            return jsonify({"error": "Failed to reset database"}), 500
+    except Exception as e:
+        print(f"Error in reset_db_route: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/admin/verify-db", methods=["GET"])
+@admin_required
+def verify_db_route():
+    """Admin route to verify database tables"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return jsonify({"tables": tables, "ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e), "ok": False}), 500
 
 
 # ---------------------------------------------------------------------------
