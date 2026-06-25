@@ -547,14 +547,6 @@
       </h3>
       <form id="createForm">
         <div class="field">
-          <label for="createName">Full Name *</label>
-          <input type="text" id="createName" placeholder="e.g. John Doe" required />
-        </div>
-        <div class="field">
-          <label for="createEmail">Email *</label>
-          <input type="email" id="createEmail" placeholder="john@example.com" required />
-        </div>
-        <div class="field">
           <label for="createSymbol">Stock *</label>
           <select id="createSymbol" required>
             <option value="TSLA">TSLA — Tesla</option>
@@ -587,7 +579,7 @@
       const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
       let currentUser = null;
       let refreshInterval = null;
-      let mockInvestments = [];
+      let investments = [];
 
       // ----- Toast -----
       const toast = document.getElementById('toast');
@@ -620,6 +612,8 @@
 
       // ----- Logout -----
       document.getElementById('logoutBtn').addEventListener('click', function() {
+        fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
+          .catch(() => {});
         sessionStorage.removeItem('investdesk_user');
         if (refreshInterval) clearInterval(refreshInterval);
         window.location.href = '/';
@@ -628,90 +622,66 @@
       // ----- Fetch API Helpers -----
       async function fetchPrices() {
         try {
-          const res = await fetch('/api/prices');
-          if (!res.ok) throw new Error('Failed to fetch prices');
+          const res = await fetch('/api/prices', { credentials: 'same-origin' });
+          if (!res.ok) {
+            if (res.status === 401) {
+              window.location.href = '/';
+              return {};
+            }
+            throw new Error('Failed to fetch prices');
+          }
           const data = await res.json();
           return data.prices || {};
         } catch (e) {
           console.error('Failed to fetch prices:', e);
-          // Return mock prices if API fails
-          return {
-            'TSLA': { price: 248.50, change_pct: 2.3 },
-            'AAPL': { price: 175.30, change_pct: -0.5 },
-            'NVDA': { price: 850.20, change_pct: 1.8 },
-            'MSFT': { price: 378.90, change_pct: 0.7 }
-          };
+          return {};
         }
       }
 
-      async function fetchInvestments(userName) {
+      async function fetchInvestments() {
         try {
-          const res = await fetch(`/api/investments?user_name=${encodeURIComponent(userName)}`);
-          if (!res.ok) throw new Error('Failed to fetch investments');
+          const res = await fetch('/api/investments', { credentials: 'same-origin' });
+          if (!res.ok) {
+            if (res.status === 401) {
+              window.location.href = '/';
+              return [];
+            }
+            throw new Error('Failed to fetch investments');
+          }
           const data = await res.json();
-          mockInvestments = data;
+          investments = data;
           return data;
         } catch (e) {
           console.error('Failed to fetch investments:', e);
-          // Return mock investments from session storage
-          const stored = sessionStorage.getItem('mock_investments');
-          if (stored) {
-            mockInvestments = JSON.parse(stored);
-            return mockInvestments;
-          }
           return [];
         }
       }
 
-      // ----- Create Investment (with fallback) -----
+      // ----- Create Investment -----
       async function createInvestment(payload) {
         try {
           const res = await fetch('/api/investments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify(payload)
           });
           
+          if (res.status === 401) {
+            window.location.href = '/';
+            return { success: false };
+          }
+          
           if (!res.ok) {
-            // If API fails, store in session storage as fallback
-            const stored = sessionStorage.getItem('mock_investments');
-            let investments = stored ? JSON.parse(stored) : [];
-            
-            // Add new investment
-            const newInvestment = {
-              user_name: payload.user_name,
-              email: payload.email,
-              symbol: payload.symbol,
-              shares: payload.shares,
-              buy_price: payload.buy_price
-            };
-            investments.push(newInvestment);
-            sessionStorage.setItem('mock_investments', JSON.stringify(investments));
-            mockInvestments = investments;
-            
-            return { success: true, data: newInvestment, fallback: true };
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to create investment');
           }
           
           const data = await res.json();
           return { success: true, data: data };
         } catch (e) {
           console.error('Error creating investment:', e);
-          // Store in session storage as fallback
-          const stored = sessionStorage.getItem('mock_investments');
-          let investments = stored ? JSON.parse(stored) : [];
-          
-          const newInvestment = {
-            user_name: payload.user_name,
-            email: payload.email,
-            symbol: payload.symbol,
-            shares: payload.shares,
-            buy_price: payload.buy_price
-          };
-          investments.push(newInvestment);
-          sessionStorage.setItem('mock_investments', JSON.stringify(investments));
-          mockInvestments = investments;
-          
-          return { success: true, data: newInvestment, fallback: true };
+          return { success: false, error: e.message };
         }
       }
 
@@ -745,13 +715,13 @@
         if (!currentUser) return;
         
         try {
-          const investments = await fetchInvestments(currentUser.name);
+          const investmentsData = await fetchInvestments();
           const prices = await fetchPrices();
           
           const tbody = document.getElementById('holdingsBody');
           const empty = document.getElementById('holdingsEmpty');
           
-          if (!investments || investments.length === 0) {
+          if (!investmentsData || investmentsData.length === 0) {
             tbody.innerHTML = '';
             empty.style.display = 'block';
             document.getElementById('sumValue').textContent = '$0.00';
@@ -768,7 +738,7 @@
           let totalValue = 0;
           let totalCost = 0;
           
-          investments.forEach(inv => {
+          investmentsData.forEach(inv => {
             const currentPrice = prices[inv.symbol]?.price || inv.buy_price || 100;
             const currentValue = inv.shares * currentPrice;
             const costBasis = inv.shares * inv.buy_price;
@@ -795,7 +765,7 @@
           document.getElementById('sumGain').textContent = `$${(totalValue - totalCost).toFixed(2)}`;
           document.getElementById('sumGainPct').textContent = 
             `${totalCost > 0 ? ((totalValue - totalCost) / totalCost * 100).toFixed(2) : '0.00'}%`;
-          document.getElementById('sumCount').textContent = investments.length;
+          document.getElementById('sumCount').textContent = investmentsData.length;
           
           const now = new Date();
           document.getElementById('lastUpdated').textContent = 
@@ -850,13 +820,12 @@
       const submitText = document.getElementById('submitBtnText');
       const submitSpinner = document.getElementById('submitSpinner');
 
-      // Open modal when button is clicked
       openBtn.addEventListener('click', () => {
         overlay.classList.remove('hidden');
-        if (currentUser) {
-          document.getElementById('createName').value = currentUser.name || '';
-          document.getElementById('createEmail').value = currentUser.email || '';
-        }
+        // Pre-fill with current user's name and email as read-only
+        document.getElementById('createSymbol').value = 'TSLA';
+        document.getElementById('createShares').value = '';
+        document.getElementById('createBuyPrice').value = '';
       });
       
       cancelBtn.addEventListener('click', () => overlay.classList.add('hidden'));
@@ -868,13 +837,11 @@
       createForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const name = document.getElementById('createName').value.trim();
-        const email = document.getElementById('createEmail').value.trim();
         const symbol = document.getElementById('createSymbol').value;
         const shares = parseFloat(document.getElementById('createShares').value);
         const buyPrice = parseFloat(document.getElementById('createBuyPrice').value);
         
-        if (!name || !email || !shares || !buyPrice) {
+        if (!shares || !buyPrice) {
           showToast('Please fill in all fields.', 'error');
           return;
         }
@@ -889,9 +856,8 @@
         submitText.textContent = 'Creating...';
         submitSpinner.classList.remove('hidden');
         
+        // Use the logged-in user's name and email from session
         const payload = {
-          user_name: name,
-          email: email,
           symbol: symbol,
           shares: shares,
           buy_price: buyPrice
@@ -904,13 +870,10 @@
             overlay.classList.add('hidden');
             createForm.reset();
             showToast('✅ Investment created successfully!', 'success');
-            
-            // Refresh the dashboard
             await refreshAll();
           } else {
-            throw new Error('Failed to create investment');
+            throw new Error(result.error || 'Failed to create investment');
           }
-          
         } catch (e) {
           showToast('❌ ' + (e.message || 'Error creating investment.'), 'error');
         } finally {
