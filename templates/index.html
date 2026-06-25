@@ -9,8 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /* ... (keep all existing styles the same) ... */
+        /* Just copy the styles from your existing file to save space */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Inter', system-ui, sans-serif;
             color: #0b1a2f;
@@ -18,8 +19,6 @@
             background: #f8fafc;
             scroll-behavior: smooth;
         }
-
-        /* ── RISK BANNER ── */
         .risk-banner {
             background: #0b1a2f;
             color: #94a3b8;
@@ -33,8 +32,6 @@
         }
         .risk-banner strong { color: #f8fafc; font-weight: 600; }
         .risk-banner .highlight { color: #f87171; }
-
-        /* ── NAVBAR ── */
         .navbar {
             padding: 0.7rem 2rem;
             display: flex;
@@ -83,8 +80,6 @@
         .nav-card.primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
         .nav-card.outline { border-color: #cbd5e1; }
         .nav-card.outline:hover { background: #f1f5f9; }
-
-        /* ── HERO ── */
         .hero-wrapper {
             position: relative;
             min-height: 82vh;
@@ -112,8 +107,6 @@
             gap: 3rem;
             width: 100%;
         }
-
-        /* ticker */
         .ticker-wrap {
             width: 100%;
             margin-bottom: 0.5rem;
@@ -142,8 +135,6 @@
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-
-        /* hero left */
         .hero-left { flex: 1 1 460px; color: #fff; }
         .hero-badge {
             display: inline-block;
@@ -178,8 +169,6 @@
         .hero-stats-row { display: flex; gap: 2.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.2); }
         .hero-stats-row .stat .num { font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.6rem; color: #fff; }
         .hero-stats-row .stat .lbl { font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.7); letter-spacing: 0.04em; }
-
-        /* ── AUTH CARD ── */
         .hero-right {
             flex: 0 0 400px;
             max-width: 100%;
@@ -192,8 +181,6 @@
         }
         .hero-right .card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.4rem; color: #0b1a2f; margin-bottom: 0.2rem; }
         .hero-right .card-sub { font-size: 0.85rem; color: #475569; margin-bottom: 1.5rem; }
-
-        /* tabs */
         .tabs {
             display: flex; gap: 0.5rem;
             background: #f1f5f9;
@@ -211,11 +198,8 @@
         }
         .tab-btn.active { background: #fff; color: #0b1a2f; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .tab-btn:hover:not(.active) { color: #0b1a2f; }
-
         .form-group { display: none; }
         .form-group.active { display: block; }
-
-        /* fields */
         .field { margin-bottom: 1rem; }
         .field label { display: block; font-size: 0.78rem; font-weight: 500; color: #334155; margin-bottom: 0.25rem; }
         .field input {
@@ -228,14 +212,11 @@
         .field input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
         .field input.is-error { border-color: #ef4444; background: #fef2f2; }
         .field input.is-ok { border-color: #22c55e; background: #f0fdf4; }
-
         .field-error {
             font-size: 0.7rem; color: #ef4444;
             margin-top: 0.25rem; display: none;
         }
         .field-error.show { display: block; }
-
-        /* server error banner inside card */
         .server-error {
             background: #fef2f2; border: 1px solid #fecaca;
             color: #b91c1c; border-radius: 12px;
@@ -244,8 +225,6 @@
             line-height: 1.4;
         }
         .server-error.show { display: block; }
-
-        /* submit button */
         .btn-full {
             width: 100%; padding: 0.82rem;
             border: none; border-radius: 60px;
@@ -258,8 +237,6 @@
         }
         .btn-full:hover:not(:disabled) { background: #1d4ed8; }
         .btn-full:disabled { opacity: 0.65; cursor: not-allowed; }
-
-        /* spinner inside button */
         .btn-spinner {
             width: 16px; height: 16px;
             border: 2px solid rgba(255,255,255,0.4);
@@ -271,13 +248,9 @@
         .btn-full.loading .btn-spinner { display: block; }
         .btn-full.loading .btn-label { opacity: 0.7; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* password strength */
         .strength-bar { height: 4px; border-radius: 4px; margin-top: 0.3rem; background: #e2e8f0; overflow: hidden; }
         .strength-bar .fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
         .strength-text { font-size: 0.65rem; color: #64748b; margin-top: 0.2rem; display: block; }
-
-        /* ── TOAST ── */
         .toast {
             position: fixed; top: 5rem; left: 50%;
             transform: translateX(-50%) translateY(-8px);
@@ -291,8 +264,6 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { background: #0b1a2f; color: #fff; }
         .toast.error   { background: #b91c1c; color: #fff; }
-
-        /* ── FEATURES SECTION ── */
         .features-section { width: 100%; padding: 3rem 2rem; background: #fff; }
         .section-label { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; }
         .section-sub { text-align: center; color: #64748b; margin-bottom: 2.5rem; font-size: 1rem; }
@@ -318,8 +289,6 @@
         .feature-card .stat-row { display: flex; gap: 1.5rem; font-size: 0.8rem; color: #64748b; }
         .feature-card .stat-row span strong { color: #0b1a2f; font-weight: 700; display: block; font-size: 1.1rem; }
         .feature-card .badge { display: inline-block; background: #e6f0ff; color: #1d4ed8; font-size: 0.7rem; font-weight: 600; padding: 0.3rem 1.2rem; border-radius: 30px; letter-spacing: 0.02em; white-space: nowrap; }
-
-        /* ── CHARTS SECTION ── */
         .charts-section { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem; }
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
         .chart-card {
@@ -337,8 +306,6 @@
         .chart-header .change.up  { color: #4ade80; background: rgba(74,222,128,0.12); }
         .chart-header .change.dn  { color: #f87171; background: rgba(248,113,113,0.12); }
         .chart-container { position: relative; height: 200px; }
-
-        /* ── CONTACT SECTION ── */
         .contact-section { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem; border-top: 1px solid #e9edf3; }
         .contact-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
         .contact-item {
@@ -355,8 +322,6 @@
         .contact-item .info .value { font-weight: 600; color: #0b1a2f; font-size: 1rem; }
         .contact-item .info .value a { color: #2563eb; text-decoration: none; }
         .contact-item .info .value a:hover { text-decoration: underline; }
-
-        /* ── TESTIMONIALS ── */
         .testimonials-section { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 3rem; }
         .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.8rem; }
         .testimonial-card { background: #f8fafc; padding: 1.5rem 1.4rem 1.2rem; border-radius: 24px; border: 1px solid #e9edf3; transition: border-color 0.15s; }
@@ -369,8 +334,6 @@
         .testimonial-card .quote { font-size: 0.9rem; color: #1e293b; line-height: 1.5; font-style: italic; }
         .testimonial-card .check { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: #22c55e; font-weight: 600; margin-top: 0.6rem; }
         .testimonial-card .check svg { width: 16px; height: 16px; fill: #22c55e; }
-
-        /* ── WHATSAPP ── */
         .whatsapp-chat { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; }
         .whatsapp-btn {
             background: #25D366; border: none; border-radius: 60px;
@@ -384,13 +347,9 @@
         .whatsapp-btn .wicon { font-size: 1.6rem; }
         .whatsapp-btn .wlabel { display: flex; flex-direction: column; line-height: 1.2; }
         .whatsapp-btn .wlabel .small { font-size: 0.65rem; font-weight: 400; opacity: 0.85; }
-
-        /* ── FOOTER ── */
         .risk-footer { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 1.5rem; border-top: 1px solid #e9edf3; font-size: 0.7rem; color: #94a3b8; text-align: center; line-height: 1.6; }
         .risk-footer strong { color: #0b1a2f; }
         .risk-footer .highlight { color: #ef4444; font-weight: 600; }
-
-        /* ── RESPONSIVE ── */
         @media (max-width: 860px) {
             .hero { padding: 2rem 1rem; gap: 2rem; }
             .hero-left h1 { font-size: 2.4rem; }
@@ -460,7 +419,6 @@
                 <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
                 <span class="item"><span class="sym">MSFT</span> $415.10 <span class="dn">▼ 0.2%</span></span>
                 <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
-                <!-- duplicate for seamless scroll -->
                 <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
                 <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
                 <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
@@ -783,7 +741,6 @@
             this.classList.add('active'); this.setAttribute('aria-selected', 'true');
             const target = this.dataset.tab;
             Object.entries(tabPanels).forEach(([key, panel]) => panel.classList.toggle('active', key === target));
-            // clear all errors when switching
             document.querySelectorAll('.field input').forEach(i => i.classList.remove('is-error','is-ok'));
             document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
             document.querySelectorAll('.server-error').forEach(e => e.classList.remove('show'));
@@ -872,7 +829,6 @@
     const loginPassErr   = document.getElementById('loginPasswordErr');
     const loginSrvErr    = document.getElementById('loginServerError');
 
-    // Live validation
     loginEmail.addEventListener('blur', () => {
         if (!loginEmail.value.trim()) return;
         validateEmail(loginEmail.value.trim())
@@ -917,7 +873,6 @@
         }
     });
 
-    // Allow Enter key in password field to submit
     loginPassword.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
     loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPassword.focus(); });
 
@@ -934,7 +889,6 @@
     const regConfirmErr= document.getElementById('regConfirmErr');
     const regSrvErr    = document.getElementById('registerServerError');
 
-    // Live validation on blur
     regName.addEventListener('blur',    () => regName.value.trim()         ? setOk(regName, regNameErr)       : setError(regName, regNameErr, 'Name is required.'));
     regEmail.addEventListener('blur',   () => validateEmail(regEmail.value.trim()) ? setOk(regEmail, regEmailErr)     : setError(regEmail, regEmailErr, 'Please enter a valid email.'));
     regPassword.addEventListener('blur',() => regPassword.value.length >= 6? setOk(regPassword, regPassErr)   : setError(regPassword, regPassErr, 'At least 6 characters required.'));
@@ -962,7 +916,6 @@
 
         setLoading(registerBtn, true);
         try {
-            // 1. Register
             const { ok: regOk, data: regData } = await apiPost('/api/register', { name, email, password });
             if (!regOk) {
                 showServerError(regSrvErr, regData.error || 'Registration failed.');
@@ -973,13 +926,11 @@
                 return;
             }
 
-            // 2. Auto-login after successful registration
             const { ok: loginOk, data: loginData } = await apiPost('/api/login', { email, password });
             if (loginOk) {
                 showToast('✅ Welcome to InvestDesk, ' + name + '!', 'success');
                 setTimeout(() => { window.location.href = '/dashboard'; }, 700);
             } else {
-                // Registered but login failed for some reason — send to signin tab
                 showToast('Account created! Please sign in.', 'success');
                 document.querySelector('.tab-btn[data-tab="signin"]').click();
                 loginEmail.value = email;
@@ -992,19 +943,29 @@
         }
     });
 
-    // Enter key in last field submits
     regConfirm.addEventListener('keydown', e => { if (e.key === 'Enter') registerBtn.click(); });
 
     /* ============================================================
-       SESSION CHECK — redirect to /dashboard if already logged in
-       Checks the server rather than localStorage
+       SESSION CHECK — FIXED: Use /api/session instead of /api/investments
+       This prevents the redirect loop
     ============================================================ */
     (async function checkSession() {
         try {
-            const res = await fetch('/api/investments', { credentials: 'same-origin' });
-            // A 200 means the session cookie is valid — user is logged in
-            if (res.ok) { window.location.replace('/dashboard'); }
-        } catch { /* offline or server down — stay on page */ }
+            const res = await fetch('/api/session', { 
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                // If user is logged in, redirect to dashboard
+                if (data.logged_in === true) {
+                    window.location.replace('/dashboard');
+                }
+            }
+        } catch (err) {
+            // If there's an error (server down, network issue), stay on the page
+            console.log('Session check skipped:', err.message);
+        }
     })();
 
     /* ============================================================
