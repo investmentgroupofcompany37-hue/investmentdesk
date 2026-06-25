@@ -302,6 +302,34 @@
       margin-top: 0.15rem;
     }
 
+    /* Error banner */
+    .error-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 0.85rem;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner .retry-btn {
+      background: #b91c1c;
+      color: white;
+      border: none;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+    }
+    .error-banner .retry-btn:hover { background: #991b1b; }
+
     .panel {
       background: #fafcff;
       border-radius: 20px;
@@ -489,7 +517,6 @@
       color: #dc2626;
     }
 
-    /* Retry button */
     .retry-btn {
       margin-top: 1rem;
       padding: 0.5rem 1.5rem;
@@ -592,6 +619,12 @@
               </span>
               <span class="meta">Create · Edit · Delete</span>
             </div>
+          </div>
+
+          <!-- Error banner -->
+          <div class="error-banner" id="errorBanner">
+            <span id="errorMessage">⚠️ Failed to load data</span>
+            <button class="retry-btn" id="retryBtn">🔄 Retry</button>
           </div>
 
           <div class="summary-strip">
@@ -703,6 +736,7 @@
       let isLoading = false;
       let retryCount = 0;
       const MAX_RETRIES = 3;
+      let refreshInterval = null;
 
       // ----- Toast -----
       const toast = document.getElementById('toast');
@@ -713,6 +747,19 @@
         toast.textContent = msg;
         toast.className = 'toast ' + type + ' show';
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+
+      // ----- Error Banner -----
+      const errorBanner = document.getElementById('errorBanner');
+      const errorMessage = document.getElementById('errorMessage');
+
+      function showError(msg) {
+        errorMessage.textContent = '⚠️ ' + msg;
+        errorBanner.classList.add('show');
+      }
+
+      function hideError() {
+        errorBanner.classList.remove('show');
       }
 
       // ----- Auth -----
@@ -732,16 +779,27 @@
           if (data.is_admin) {
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
+            hideError();
             await loadAdminData();
             await updateTicker();
+            // Start auto-refresh
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(async () => {
+              if (!adminShell.classList.contains('hidden')) {
+                await loadAdminData(false);
+                await updateTicker();
+              }
+            }, 30000);
           } else {
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            if (refreshInterval) clearInterval(refreshInterval);
           }
         } catch (e) {
           console.error('Session check error:', e);
           loginShell.classList.remove('hidden');
           adminShell.classList.add('hidden');
+          if (refreshInterval) clearInterval(refreshInterval);
         }
       }
 
@@ -767,9 +825,18 @@
           if (data.ok) {
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
+            hideError();
             showToast('Welcome, Admin!', 'success');
             await loadAdminData();
             await updateTicker();
+            // Start auto-refresh
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(async () => {
+              if (!adminShell.classList.contains('hidden')) {
+                await loadAdminData(false);
+                await updateTicker();
+              }
+            }, 30000);
           } else {
             loginError.textContent = data.error || 'Invalid username or password.';
             loginError.classList.add('show');
@@ -788,16 +855,25 @@
             credentials: 'same-origin'
           }); 
         } catch (e) {}
+        if (refreshInterval) clearInterval(refreshInterval);
         loginShell.classList.remove('hidden');
         adminShell.classList.add('hidden');
         showToast('Signed out.', 'success');
       });
 
+      // ----- Retry button -----
+      document.getElementById('retryBtn').addEventListener('click', function() {
+        retryCount = 0;
+        hideError();
+        loadAdminData(true);
+        showToast('🔄 Retrying...', 'success');
+      });
+
       // ----- Data Loading with Retry -----
       async function fetchPrices() {
         try {
-          const res = await fetch('/api/prices');
-          if (!res.ok) throw new Error('Failed to fetch prices');
+          const res = await fetch('/api/prices', { credentials: 'same-origin' });
+          if (!res.ok) throw new Error('Failed to fetch prices: ' + res.status);
           const data = await res.json();
           pricesCache = data.prices || {};
           return pricesCache;
@@ -818,10 +894,11 @@
           // Show loading state
           tbody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading investments...</td></tr>';
           empty.classList.add('hidden');
+          hideError();
           
           // Fetch investments with timeout
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
           
           const invRes = await fetch('/api/admin/investments', {
             credentials: 'same-origin',
@@ -834,6 +911,7 @@
             showToast('Session expired. Please login again.', 'error');
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            if (refreshInterval) clearInterval(refreshInterval);
             isLoading = false;
             return;
           }
@@ -862,14 +940,18 @@
           
           if (e.name === 'AbortError') {
             tbody.innerHTML = `<tr class="error-row"><td colspan="11">⏱️ Request timed out. The server might be starting up.</td></tr>`;
-            showToast('⏱️ Request timed out. Retrying...', 'error');
+            showError('Request timed out. The server might be starting up.');
             
             // Retry after delay
             if (retry && retryCount < MAX_RETRIES) {
               retryCount++;
+              const delay = 2000 * retryCount;
+              showToast(`⏱️ Retrying in ${delay/1000}s... (attempt ${retryCount}/${MAX_RETRIES})`, 'error');
               setTimeout(() => {
                 loadAdminData(true);
-              }, 2000 * retryCount);
+              }, delay);
+            } else if (retryCount >= MAX_RETRIES) {
+              showError('Max retries reached. Please click Retry or Refresh.');
             }
           } else {
             tbody.innerHTML = `
@@ -881,6 +963,7 @@
                 </td>
               </tr>
             `;
+            showError(e.message || 'Failed to load data');
             showToast('❌ Failed to load data. Click Retry or Refresh.', 'error');
           }
         } finally {
@@ -891,6 +974,7 @@
       // Expose retry function globally
       window.retryLoadData = function() {
         retryCount = 0;
+        hideError();
         loadAdminData(true);
       };
 
@@ -976,23 +1060,32 @@
       }
 
       async function updateTicker() {
-        const prices = await fetchPrices();
-        const track = document.getElementById('tickerTrack');
-        let html = '';
-        
-        Object.entries(prices).forEach(([symbol, data]) => {
-          const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
-          const arrow = data.change_pct >= 0 ? '▲' : '▼';
-          html += `
-            <div class="ticker-item">
-              <span class="sym">${symbol}</span> 
-              $${data.price ? data.price.toFixed(2) : 'N/A'} 
-              <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
-            </div>
-          `;
-        });
-        
-        track.innerHTML = html + html;
+        try {
+          const prices = await fetchPrices();
+          const track = document.getElementById('tickerTrack');
+          let html = '';
+          
+          if (Object.keys(prices).length === 0) {
+            track.innerHTML = '<div class="ticker-item">Loading prices...</div>';
+            return;
+          }
+          
+          Object.entries(prices).forEach(([symbol, data]) => {
+            const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
+            const arrow = data.change_pct >= 0 ? '▲' : '▼';
+            html += `
+              <div class="ticker-item">
+                <span class="sym">${symbol}</span> 
+                $${data.price ? data.price.toFixed(2) : 'N/A'} 
+                <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
+              </div>
+            `;
+          });
+          
+          track.innerHTML = html + html;
+        } catch (e) {
+          console.error('Error updating ticker:', e);
+        }
       }
 
       // ----- Modal Functions -----
@@ -1034,6 +1127,7 @@
             showToast('Session expired. Please login again.', 'error');
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            if (refreshInterval) clearInterval(refreshInterval);
             return;
           }
           
@@ -1156,6 +1250,7 @@
             showToast('Session expired. Please login again.', 'error');
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            if (refreshInterval) clearInterval(refreshInterval);
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
             return;
@@ -1237,6 +1332,7 @@
       // ----- Refresh -----
       document.getElementById('refreshBtn').addEventListener('click', async function() {
         retryCount = 0;
+        hideError();
         await loadAdminData();
         await updateTicker();
         showToast('Refreshed!', 'success');
@@ -1252,14 +1348,6 @@
 
       // ----- Init -----
       checkAdminSession();
-
-      // Auto-refresh every 30 seconds
-      setInterval(async () => {
-        if (!adminShell.classList.contains('hidden')) {
-          await loadAdminData(false);
-          await updateTicker();
-        }
-      }, 30000);
     })();
   </script>
 </body>
