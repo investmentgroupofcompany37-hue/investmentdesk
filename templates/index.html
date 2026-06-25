@@ -1,1266 +1,1548 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InvestDesk · Admin · Full CRUD</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      color: #0b1b33;
-      line-height: 1.5;
-      min-height: 100vh;
-      background: #f0f4fe;
-    }
-    .login-shell {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      position: relative;
-      background:
-        linear-gradient(135deg, rgba(11, 27, 51, 0.75) 0%, rgba(37, 99, 235, 0.40) 60%, rgba(11, 27, 51, 0.70) 100%),
-        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-    }
-    .login-shell::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      backdrop-filter: blur(2px);
-      z-index: 0;
-    }
-    .login-card {
-      position: relative;
-      z-index: 1;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      padding: 2.5rem 2.5rem 2rem;
-      border-radius: 36px;
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      max-width: 400px;
-      width: 100%;
-    }
-    .login-card .mark {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.8rem;
-      letter-spacing: -0.03em;
-      color: #0b1b33;
-      text-align: center;
-      margin-bottom: 0.2rem;
-    }
-    .login-card .mark svg {
-      width: 32px;
-      height: 32px;
-      fill: #2563eb;
-      vertical-align: middle;
-      margin-right: 0.2rem;
-    }
-    .login-card h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      text-align: center;
-      color: #475569;
-      margin-bottom: 1.5rem;
-    }
-    .login-error {
-      background: #fef2f2;
-      color: #dc2626;
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    .login-error.show { display: block; }
-    .login-card .field {
-      margin-bottom: 1rem;
-    }
-    .login-card .field label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #334155;
-      margin-bottom: 0.2rem;
-    }
-    .login-card .field input {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      border-radius: 14px;
-      border: 1px solid #d0d9e6;
-      background: rgba(255, 255, 255, 0.8);
-      font-size: 0.95rem;
-      font-family: 'Inter', sans-serif;
-      transition: 0.12s;
-    }
-    .login-card .field input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-      background: white;
-    }
-    .btn {
-      background: transparent;
-      border: 1px solid #d0d9e6;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.15s;
-      color: #1e293b;
-      font-family: 'Inter', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .btn-primary {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: white;
-    }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-danger {
-      background: #dc2626;
-      border-color: #dc2626;
-      color: white;
-    }
-    .btn-danger:hover { background: #b91c1c; }
-    .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
-    .btn-success {
-      background: #16a34a;
-      border-color: #16a34a;
-      color: white;
-    }
-    .btn-success:hover { background: #15803d; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InvestDesk · Trade Smarter</title>
+    <!-- Inter & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #0b1a2f;
+            line-height: 1.5;
+            background: #f8fafc;
+            scroll-behavior: smooth;
+        }
 
-    .hidden { display: none !important; }
+        /* ----- TOP RISK BANNER ----- */
+        .risk-banner {
+            background: #0b1a2f;
+            color: #94a3b8;
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 0.4rem 1rem;
+            letter-spacing: 0.01em;
+            border-bottom: 1px solid #1e2d45;
+            position: relative;
+            z-index: 5;
+        }
+        .risk-banner strong {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+        .risk-banner .highlight {
+            color: #f87171;
+        }
 
-    .admin-wrapper {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 1.5rem;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        /* ----- NAVBAR (glass) ----- */
+        .navbar {
+            padding: 0.7rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .nav-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.03em;
+            color: #0b1a2f;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .nav-brand svg {
+            width: 26px;
+            height: 26px;
+            fill: #2563eb;
+        }
 
-    .ticker-tape {
-      background: #0b1b33;
-      color: #b9c8e0;
-      padding: 0.5rem 0;
-      overflow: hidden;
-      white-space: nowrap;
-      border-radius: 16px 16px 0 0;
-      font-size: 0.85rem;
-      letter-spacing: 0.01em;
-      flex-shrink: 0;
-    }
-    .ticker-track {
-      display: inline-flex;
-      gap: 2.8rem;
-      animation: tickerScroll 36s linear infinite;
-      padding-left: 2rem;
-    }
-    .ticker-item .sym { font-weight: 600; color: #f0f4ff; }
-    .ticker-item .change-up { color: #4ade80; }
-    .ticker-item .change-down { color: #f87171; }
-    @keyframes tickerScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
+        .nav-cards {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-card {
+            background: transparent;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #334155;
+            text-decoration: none;
+            transition: 0.15s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .nav-card:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+        }
+        .nav-card .icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .nav-card.primary {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .nav-card.primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+        .nav-card.outline {
+            border-color: #cbd5e1;
+            cursor: pointer;
+        }
+        .nav-card.outline:hover {
+            background: #f1f5f9;
+        }
 
-    .shell {
-      background: #ffffff;
-      border-radius: 0 0 32px 32px;
-      box-shadow: 0 20px 60px rgba(0,20,50,0.06);
-      border: 1px solid #e8edf6;
-      border-top: none;
-      display: flex;
-      flex-wrap: wrap;
-      flex: 1;
-    }
+        /* ===== HERO ===== */
+        .hero-wrapper {
+            position: relative;
+            min-height: 82vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                linear-gradient(135deg, rgba(11, 26, 47, 0.70) 0%, rgba(11, 26, 47, 0.35) 60%, rgba(37, 99, 235, 0.20) 100%),
+                url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            filter: saturate(1.1);
+        }
+        .hero {
+            position: relative;
+            z-index: 2;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem 4rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 3rem;
+            width: 100%;
+        }
 
-    .rail {
-      width: 230px;
-      background: #fafcff;
-      padding: 2rem 1.2rem 1.5rem;
-      border-right: 1px solid #e8edf6;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-    .rail-brand .mark {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.6rem;
-      letter-spacing: -0.03em;
-      color: #0b1b33;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .rail-brand .mark svg { width: 28px; height: 28px; fill: #2563eb; }
-    .rail-brand .sub { font-size: 0.7rem; color: #64748b; letter-spacing: 0.04em; margin-top: 0.1rem; padding-left: 0.2rem; }
-    .rail-nav { margin: 2.2rem 0 1.8rem; display:flex; flex-direction:column; gap:0.4rem; }
-    .rail-link {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.6rem 0.75rem;
-      border-radius: 12px;
-      color: #64748b;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: 0.15s;
-    }
-    .rail-link svg { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
-    .rail-link.active {
-      background: #dbeafe;
-      color: #2563eb;
-      font-weight: 600;
-    }
-    .rail-link:hover:not(.active) { background: #f1f5f9; }
-    .rail-foot {
-      margin-top: auto;
-      font-size: 0.75rem;
-      color: #64748b;
-      border-top: 1px solid #e8edf6;
-      padding-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+        .ticker-wrap {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            border-radius: 60px;
+            padding: 0.3rem 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            overflow: hidden;
+        }
+        .ticker-track {
+            display: flex;
+            gap: 2.5rem;
+            animation: tickerScroll 40s linear infinite;
+            white-space: nowrap;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.2rem 0;
+            width: max-content;
+        }
+        .ticker-track .item .sym {
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 0.2rem;
+        }
+        .ticker-track .item .up { color: #4ade80; }
+        .ticker-track .item .down { color: #f87171; }
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
-    .main {
-      flex: 1;
-      padding: 1.8rem 2rem 2rem;
-      background: #ffffff;
-      min-width: 0;
-    }
-    .main-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.8rem;
-    }
-    .main-header h1 {
-      font-size: 1.6rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .main-header h1 svg { width: 28px; height: 28px; fill: #2563eb; }
-    .live-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #22c55e;
-      border-radius: 50%;
-      box-shadow: 0 0 0 3px #dcfce7;
-      animation: pulse-dot 2s infinite;
-    }
-    @keyframes pulse-dot { 0% { opacity:1; } 50% { opacity:0.5; } 100% { opacity:1; } }
-    .meta {
-      color: #64748b;
-      font-size: 0.8rem;
-      background: #f1f5f9;
-      padding: 0.3rem 1rem;
-      border-radius: 40px;
-    }
+        .hero-left {
+            flex: 1 1 460px;
+            color: #ffffff;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.25);
+            backdrop-filter: blur(4px);
+            color: #bfdbfe;
+            font-weight: 600;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            padding: 0.25rem 1rem;
+            border-radius: 60px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(191, 219, 254, 0.25);
+        }
+        .hero-left h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+        .hero-left h1 .highlight { color: #60a5fa; }
+        .hero-left .sub {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin: 1rem 0 1.6rem;
+            max-width: 480px;
+            line-height: 1.6;
+            text-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
+        }
+        .hero-stats-row {
+            display: flex;
+            gap: 2.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-stats-row .stat .num {
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #ffffff;
+        }
+        .hero-stats-row .stat .lbl {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.04em;
+        }
 
-    .summary-strip {
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 0.8rem;
-      margin-bottom: 2rem;
-    }
-    .summary-cell {
-      background: #f8fafc;
-      padding: 0.8rem 1rem;
-      border-radius: 16px;
-      border: 1px solid #e8edf6;
-      display: flex;
-      flex-direction: column;
-    }
-    .summary-cell .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #64748b;
-    }
-    .summary-cell .value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-top: 0.15rem;
-    }
+        /* Auth card */
+        .hero-right {
+            flex: 0 0 400px;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2rem 2rem 1.8rem;
+        }
+        .hero-right .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #0b1a2f;
+            margin-bottom: 0.2rem;
+        }
+        .hero-right .card-sub {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 1.5rem;
+        }
 
-    .panel {
-      background: #fafcff;
-      border-radius: 20px;
-      border: 1px solid #e8edf6;
-      padding: 1.2rem 1.2rem 0.5rem;
-      margin-top: 1rem;
-    }
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .panel-head h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .panel-head h2 svg { width: 22px; height: 22px; fill: #2563eb; }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            border-radius: 60px;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9edf3;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.5rem 0;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.12s;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn.active {
+            background: #ffffff;
+            color: #0b1a2f;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .tab-btn:hover:not(.active) { color: #0b1a2f; }
 
-    table { width:100%; border-collapse:collapse; font-size:0.85rem; }
-    th { text-align:left; padding:0.5rem 0.25rem; color:#64748b; font-weight:500; border-bottom:1px solid #e8edf6; }
-    td { padding:0.6rem 0.25rem; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
-    .empty-state { text-align:center; padding:2rem 0; color:#64748b; }
-    .empty-state .icon { font-size:2rem; opacity:0.4; }
+        .form-group { display: none; }
+        .form-group.active { display: block; }
 
-    .actions-cell {
-      display: flex;
-      gap: 0.3rem;
-      flex-wrap: wrap;
-    }
-    .btn-icon {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      transition: 0.12s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-      border: 1px solid transparent;
-    }
-    .btn-icon:hover { opacity: 0.75; transform: scale(1.05); }
-    .btn-icon.edit {
-      background: #dbeafe;
-      color: #1d4ed8;
-      border-color: #b9d0f6;
-    }
-    .btn-icon.delete {
-      background: #fee2e2;
-      color: #b91c1c;
-      border-color: #fecaca;
-    }
-    .btn-icon.create {
-      background: #dcfce7;
-      color: #15803d;
-      border-color: #bbf7d0;
-    }
-    .btn-icon svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
+        .field {
+            margin-bottom: 1rem;
+        }
+        .field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.2rem;
+        }
+        .field input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            background: #fafcff;
+            font-size: 0.95rem;
+            transition: 0.12s;
+            font-family: 'Inter', sans-serif;
+        }
+        .field input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+        }
+        .field input.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        .field input.success {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+        .error-msg {
+            font-size: 0.7rem;
+            color: #ef4444;
+            margin-top: 0.2rem;
+            display: none;
+        }
+        .error-msg.show { display: block; }
 
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-    .modal-overlay.hidden { display: none; }
-    .modal {
-      background: white;
-      padding: 2rem;
-      border-radius: 32px;
-      max-width: 420px;
-      width: 100%;
-      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
-    }
-    .modal h3 {
-      font-size: 1.2rem;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .modal h3 svg { width: 24px; height: 24px; fill: #2563eb; }
-    .modal .field {
-      margin-bottom: 0.8rem;
-    }
-    .modal .field label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #475569;
-      margin-bottom: 0.2rem;
-    }
-    .modal .field input,
-    .modal .field select {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border-radius: 14px;
-      border: 1px solid #d0d9e6;
-      background: white;
-      font-family: 'Inter', sans-serif;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
-      margin-top: 1.2rem;
-    }
+        .btn-full {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: 'Inter', sans-serif;
+            background: #2563eb;
+            color: white;
+        }
+        .btn-full:hover { background: #1d4ed8; }
+        .btn-full:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .toast {
-      position: fixed;
-      top: 5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0b1a2f;
-      color: white;
-      padding: 0.7rem 2rem;
-      border-radius: 60px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-      opacity: 0;
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: none;
-      z-index: 1000;
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast.success { background: #0b1a2f; }
-    .toast.error { background: #b91c1c; }
+        .demo-hint {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 1.2rem;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+        }
+        .demo-hint span {
+            background: #f1f5f9;
+            padding: 0.15rem 0.7rem;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 0.65rem;
+            color: #0b1a2f;
+        }
 
-    .sync-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: #dcfce7;
-      color: #15803d;
-      padding: 0.2rem 0.8rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    .sync-badge svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
+        .strength-bar {
+            height: 4px;
+            border-radius: 4px;
+            margin-top: 0.3rem;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+        .strength-bar .fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .strength-text {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+            display: block;
+        }
 
-    .user-badge {
-      display: inline-block;
-      background: #e0e7ff;
-      color: #3730a3;
-      padding: 0.1rem 0.5rem;
-      border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: 500;
-    }
+        /* ===== FEATURES SECTION - FULL WIDTH CARDS ===== */
+        .features-section {
+            width: 100%;
+            max-width: 100%;
+            padding: 3rem 2rem;
+            background: #ffffff;
+        }
+        .features-section .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .features-section .section-sub {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2.5rem;
+            font-size: 1rem;
+        }
 
-    .loading-row td {
-      text-align: center;
-      padding: 2rem;
-      color: #64748b;
-    }
+        /* Full-width grid - each card takes full width */
+        .features-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
 
-    .error-row td {
-      text-align: center;
-      padding: 2rem;
-      color: #dc2626;
-    }
+        .feature-card {
+            background: #f8fafc;
+            padding: 2rem 2.5rem;
+            border-radius: 24px;
+            border: 1px solid #e9edf3;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            scroll-margin-top: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        .feature-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.08);
+            transform: translateY(-2px);
+            background: #ffffff;
+        }
+        .feature-card .card-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 2 1 300px;
+        }
+        .feature-card .icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+        .feature-card .card-content {
+            flex: 1;
+        }
+        .feature-card .card-content h3 {
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.01em;
+        }
+        .feature-card .card-content .desc {
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .feature-card .card-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1 1 auto;
+            flex-wrap: wrap;
+        }
+        .feature-card .stat-row {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .feature-card .stat-row span strong {
+            color: #0b1a2f;
+            font-weight: 700;
+            display: block;
+            font-size: 1.1rem;
+        }
+        .feature-card .badge {
+            display: inline-block;
+            background: #e6f0ff;
+            color: #1d4ed8;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+        .feature-card.highlight-card {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
 
-    /* Retry button */
-    .retry-btn {
-      margin-top: 1rem;
-      padding: 0.5rem 1.5rem;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-    }
-    .retry-btn:hover {
-      background: #1d4ed8;
-    }
+        /* ===== CONTACT SECTION ===== */
+        .contact-section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: #ffffff;
+            border-top: 1px solid #e9edf3;
+        }
+        .contact-section .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .contact-section .section-sub {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+        .contact-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .contact-item {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-radius: 24px;
+            border: 1px solid #e9edf3;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: 0.15s;
+            min-width: 200px;
+        }
+        .contact-item:hover {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .contact-item .icon {
+            font-size: 2rem;
+        }
+        .contact-item .info {
+            display: flex;
+            flex-direction: column;
+        }
+        .contact-item .info .label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .contact-item .info .value {
+            font-weight: 600;
+            color: #0b1a2f;
+            font-size: 1rem;
+        }
+        .contact-item .info .value a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .contact-item .info .value a:hover {
+            text-decoration: underline;
+        }
 
-    @media (max-width:860px) {
-      .rail { width:100%; border-right:none; border-bottom:1px solid #e8edf6; }
-      .login-card { padding: 2rem 1.5rem; }
-      .main { padding: 1.2rem; }
-      .summary-strip { grid-template-columns: 1fr 1fr; }
-      .admin-wrapper { padding: 0.5rem; }
-      .ticker-tape { border-radius: 0; }
-      .shell { border-radius: 0; }
-    }
-    @media (max-width:600px) {
-      .summary-strip { grid-template-columns: 1fr; }
-      table { font-size: 0.7rem; }
-      .actions-cell { flex-direction: row; gap: 0.2rem; }
-      .btn-icon { font-size: 0.65rem; padding: 0.15rem 0.4rem; }
-    }
-  </style>
+        /* ===== CHARTS SECTION - TRADING STYLE ===== */
+        .charts-section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            background: #f1f5f9;
+        }
+        .charts-section .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .charts-section .section-sub {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .chart-card {
+            background: #0b1a2f;
+            border-radius: 20px;
+            padding: 1.5rem 1.2rem 1.2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            border: 1px solid #1e2d45;
+            transition: 0.15s;
+        }
+        .chart-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 12px 40px rgba(37,99,235,0.12);
+        }
+        .chart-card .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            color: #e2e8f0;
+        }
+        .chart-card .chart-header .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+        .chart-card .chart-header .price {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+        .chart-card .chart-header .change {
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.06);
+        }
+        .chart-card .chart-header .change.up { color: #4ade80; background: rgba(74, 222, 128, 0.12); }
+        .chart-card .chart-header .change.down { color: #f87171; background: rgba(248, 113, 113, 0.12); }
+        .chart-card .chart-container {
+            position: relative;
+            height: 200px;
+        }
+
+        /* ===== WHATSAPP CHAT BUTTON ===== */
+        .whatsapp-chat {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.6rem;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            border: none;
+            border-radius: 60px;
+            padding: 0.9rem 1.8rem;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 28px rgba(37, 211, 102, 0.4);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+        }
+        .whatsapp-btn:hover {
+            background: #1da851;
+            transform: scale(1.04);
+            box-shadow: 0 12px 36px rgba(37, 211, 102, 0.5);
+        }
+        .whatsapp-btn .icon {
+            font-size: 1.6rem;
+        }
+        .whatsapp-btn .label {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .whatsapp-btn .label .small {
+            font-size: 0.65rem;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials-section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 2rem 3rem;
+            background: #ffffff;
+        }
+        .testimonials-section .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.8rem;
+        }
+        .testimonial-card {
+            background: #f8fafc;
+            padding: 1.5rem 1.4rem 1.2rem;
+            border-radius: 24px;
+            border: 1px solid #e9edf3;
+            transition: 0.15s;
+        }
+        .testimonial-card:hover { border-color: #bfdbfe; }
+        .testimonial-card .person {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+        .testimonial-card .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+        .testimonial-card .name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .testimonial-card .role {
+            font-size: 0.7rem;
+            color: #2563eb;
+            font-weight: 500;
+        }
+        .testimonial-card .stars {
+            color: #f59e0b;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+        .testimonial-card .quote {
+            font-size: 0.9rem;
+            color: #1e293b;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        .testimonial-card .check {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            color: #22c55e;
+            font-weight: 600;
+            margin-top: 0.6rem;
+        }
+        .testimonial-card .check svg {
+            width: 16px;
+            height: 16px;
+            fill: #22c55e;
+        }
+
+        /* ===== RISK FOOTER ===== */
+        .risk-footer {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 2rem 1.5rem;
+            border-top: 1px solid #e9edf3;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.6;
+            background: #f8fafc;
+        }
+        .risk-footer strong {
+            color: #0b1a2f;
+        }
+        .risk-footer .highlight {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            top: 5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0b1a2f;
+            color: white;
+            padding: 0.7rem 2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { background: #0b1a2f; }
+        .toast.error { background: #b91c1c; }
+
+        @media (max-width: 860px) {
+            .hero { padding: 2rem 1rem; gap: 2rem; }
+            .hero-left h1 { font-size: 2.4rem; }
+            .hero-right { flex: 0 0 100%; }
+            .navbar { padding: 0.6rem 1rem; background: rgba(255,255,255,0.95); }
+            .nav-cards { gap: 0.3rem; }
+            .nav-card { font-size: 0.75rem; padding: 0.3rem 0.7rem; }
+            .features-section { padding: 2rem 1rem; }
+            .charts-section { padding: 2rem 1rem; }
+            .testimonials-section { padding: 1.5rem 1rem 2rem; }
+            .hero-wrapper { min-height: 70vh; }
+            .ticker-track { font-size: 0.7rem; gap: 1.5rem; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .feature-card {
+                padding: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .feature-card .card-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .whatsapp-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .whatsapp-btn .label .small { display: none; }
+        }
+        @media (max-width: 480px) {
+            .hero-stats-row { flex-wrap: wrap; gap: 1rem; }
+            .hero-right { padding: 1.5rem 1.2rem; }
+            .testimonial-grid { grid-template-columns: 1fr; }
+            .hero-left h1 { font-size: 2rem; }
+            .nav-brand { font-size: 1.2rem; }
+            .nav-card { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
+            .feature-card .card-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+            .feature-card .stat-row {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="toast" id="toast"></div>
 
-  <!-- LOGIN -->
-  <div class="login-shell" id="loginShell">
-    <div class="login-card">
-      <div class="mark">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-        INVESTDESK
-      </div>
-      <h1>Admin sign in</h1>
-      <div class="login-error" id="loginError"></div>
-      <form id="loginForm">
-        <div class="field">
-          <label for="loginUsername">Username</label>
-          <input type="text" id="loginUsername" value="admin" autocomplete="username" required />
-        </div>
-        <div class="field">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" value="admin123" autocomplete="current-password" required />
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">Sign in</button>
-      </form>
+    <!-- RISK BANNER -->
+    <div class="risk-banner">
+        <strong>Risk warning:</strong> 78.48% of retail investors lose money when trading CFDs with this provider.
+        <span class="highlight">Ensure you understand the risks.</span>
     </div>
-  </div>
 
-  <!-- ADMIN SHELL -->
-  <div class="hidden" id="adminShell">
-    <div class="admin-wrapper">
-      <div class="ticker-tape">
-        <div class="ticker-track" id="tickerTrack"></div>
-      </div>
-
-      <div class="shell">
-        <aside class="rail">
-          <div class="rail-brand">
-            <div class="mark">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-              INVESTDESK
-            </div>
-            <div class="sub">Admin · Full CRUD</div>
-          </div>
-          <nav class="rail-nav">
-            <a class="rail-link" href="/dashboard" target="_blank">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard
-            </a>
-            <a class="rail-link active" href="#">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
-              Admin panel
-            </a>
-          </nav>
-          <div class="rail-foot">
-            <button class="btn btn-sm" id="logoutBtn" style="width:100%;">Sign out</button>
-          </div>
-        </aside>
-
-        <main class="main">
-          <div class="main-header">
-            <h1>
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
-              <span class="live-dot"></span> Admin Panel
-            </h1>
-            <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
-              <span class="sync-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                Syncs with Dashboard
-              </span>
-              <span class="meta">Create · Edit · Delete</span>
-            </div>
-          </div>
-
-          <div class="summary-strip">
-            <div class="summary-cell"><div class="label">Total positions</div><div class="value" id="statTotalRows">0</div></div>
-            <div class="summary-cell"><div class="label">Unique users</div><div class="value" id="statTotalUsers">0</div></div>
-            <div class="summary-cell"><div class="label">Total invested</div><div class="value" id="statTotalInvested">$0.00</div></div>
-            <div class="summary-cell"><div class="label">Market value</div><div class="value" id="statTotalValue">$0.00</div></div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h2>All Holdings</h2>
-              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                <button class="btn btn-sm btn-success" id="createBtn">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                  New
-                </button>
-                <button class="btn btn-sm" id="refreshBtn">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                  Refresh
-                </button>
-                <button class="btn btn-sm btn-danger" id="resetDbBtn">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-                  Reset DB
-                </button>
-              </div>
-            </div>
-            <div style="overflow-x:auto;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Symbol</th>
-                    <th>Shares</th>
-                    <th>Buy price</th>
-                    <th>Cost basis</th>
-                    <th>Current price</th>
-                    <th>Market value</th>
-                    <th>Gain / loss</th>
-                    <th style="min-width:130px;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="adminBody">
-                  <tr class="loading-row">
-                    <td colspan="11">Loading investments...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="empty-state hidden" id="adminEmpty">
-              <div class="icon">◌</div>
-              No records found. Click <strong>New</strong> to add one.
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL (create / edit) -->
-  <div class="modal-overlay hidden" id="editModalOverlay">
-    <div class="modal">
-      <h3 id="modalTitle">
-        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        <span id="modalTitleText">Edit investment</span>
-      </h3>
-      <form id="editForm">
-        <input type="hidden" id="editId" />
-        <div class="field">
-          <label for="editUserName">User Name *</label>
-          <input type="text" id="editUserName" required placeholder="e.g. Kaka90" />
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+            INVESTDESK
         </div>
-        <div class="field">
-          <label for="editEmail">Email</label>
-          <input type="email" id="editEmail" placeholder="user@example.com" />
+        <div class="nav-cards">
+            <a href="#trade-card" class="nav-card"><span class="icon">📈</span> Trade</a>
+            <a href="#markets-card" class="nav-card"><span class="icon">🌍</span> Markets</a>
+            <a href="#platform-card" class="nav-card"><span class="icon">⚙️</span> Platform</a>
+            <a href="#pricing-card" class="nav-card"><span class="icon">💰</span> Pricing</a>
+            <a href="#" class="nav-card outline" id="loginNavBtn"><span class="icon">🔑</span> Log in</a>
+            <a href="#" class="nav-card primary" id="getStartedBtn"><span class="icon">🚀</span> Get started</a>
         </div>
-        <div class="field">
-          <label for="editSymbol">Symbol *</label>
-          <select id="editSymbol" required>
-            <option value="TSLA">TSLA — Tesla</option>
-            <option value="AAPL">AAPL — Apple</option>
-            <option value="NVDA">NVDA — NVIDIA</option>
-            <option value="MSFT">MSFT — Microsoft</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="editShares">Shares *</label>
-          <input type="number" id="editShares" step="0.0001" min="0.0001" required placeholder="e.g. 10" />
-        </div>
-        <div class="field">
-          <label for="editBuyPrice">Buy Price ($) *</label>
-          <input type="number" id="editBuyPrice" step="0.01" min="0.01" required placeholder="e.g. 150.00" />
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn" id="cancelEdit">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="modalSubmitBtn">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
+    </nav>
 
-  <script>
-    (function() {
-      const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
-      let allInvestments = [];
-      let pricesCache = {};
-      let isLoading = false;
-      let retryCount = 0;
-      const MAX_RETRIES = 3;
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
-      // ----- Toast -----
-      const toast = document.getElementById('toast');
-      let toastTimer = null;
-
-      function showToast(msg, type = 'success') {
-        if (toastTimer) clearTimeout(toastTimer);
-        toast.textContent = msg;
-        toast.className = 'toast ' + type + ' show';
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-      }
-
-      // ----- Auth -----
-      const loginShell = document.getElementById('loginShell');
-      const adminShell = document.getElementById('adminShell');
-      const loginError = document.getElementById('loginError');
-      const loginForm = document.getElementById('loginForm');
-      const loginUsername = document.getElementById('loginUsername');
-      const loginPassword = document.getElementById('loginPassword');
-
-      async function checkAdminSession() {
-        try {
-          const res = await fetch('/api/admin/session', {
-            credentials: 'same-origin'
-          });
-          const data = await res.json();
-          if (data.is_admin) {
-            loginShell.classList.add('hidden');
-            adminShell.classList.remove('hidden');
-            await loadAdminData();
-            await updateTicker();
-          } else {
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-          }
-        } catch (e) {
-          console.error('Session check error:', e);
-          loginShell.classList.remove('hidden');
-          adminShell.classList.add('hidden');
-        }
-      }
-
-      loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        loginError.classList.remove('show');
-        loginError.textContent = '';
-        const username = loginUsername.value.trim();
-        const password = loginPassword.value.trim();
-        if (!username || !password) {
-          loginError.textContent = 'Please enter both username and password.';
-          loginError.classList.add('show');
-          return;
-        }
-        try {
-          const res = await fetch('/api/admin/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ username, password })
-          });
-          const data = await res.json();
-          if (data.ok) {
-            loginShell.classList.add('hidden');
-            adminShell.classList.remove('hidden');
-            showToast('Welcome, Admin!', 'success');
-            await loadAdminData();
-            await updateTicker();
-          } else {
-            loginError.textContent = data.error || 'Invalid username or password.';
-            loginError.classList.add('show');
-          }
-        } catch (e) {
-          console.error('Login error:', e);
-          loginError.textContent = 'Network error. Please try again.';
-          loginError.classList.add('show');
-        }
-      });
-
-      document.getElementById('logoutBtn').addEventListener('click', async function() {
-        try { 
-          await fetch('/api/admin/logout', { 
-            method: 'POST',
-            credentials: 'same-origin'
-          }); 
-        } catch (e) {}
-        loginShell.classList.remove('hidden');
-        adminShell.classList.add('hidden');
-        showToast('Signed out.', 'success');
-      });
-
-      // ----- Data Loading with Retry -----
-      async function fetchPrices() {
-        try {
-          const res = await fetch('/api/prices');
-          if (!res.ok) throw new Error('Failed to fetch prices');
-          const data = await res.json();
-          pricesCache = data.prices || {};
-          return pricesCache;
-        } catch (e) {
-          console.error('Failed to fetch prices:', e);
-          return {};
-        }
-      }
-
-      async function loadAdminData(retry = true) {
-        if (isLoading) return;
-        isLoading = true;
-        
-        const tbody = document.getElementById('adminBody');
-        const empty = document.getElementById('adminEmpty');
-        
-        try {
-          // Show loading state
-          tbody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading investments...</td></tr>';
-          empty.classList.add('hidden');
-          
-          // Fetch investments with timeout
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
-          
-          const invRes = await fetch('/api/admin/investments', {
-            credentials: 'same-origin',
-            signal: controller.signal
-          });
-          
-          clearTimeout(timeoutId);
-          
-          if (invRes.status === 401) {
-            showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-            isLoading = false;
-            return;
-          }
-          
-          if (!invRes.ok) {
-            const errorText = await invRes.text();
-            console.error('Failed to fetch investments:', errorText);
-            throw new Error(`Failed to fetch investments: ${invRes.status}`);
-          }
-          
-          const data = await invRes.json();
-          allInvestments = data || [];
-          console.log('Loaded investments:', allInvestments.length);
-          
-          // Reset retry count on success
-          retryCount = 0;
-          
-          // Fetch prices
-          await fetchPrices();
-          
-          renderAdminTable(allInvestments, pricesCache);
-          updateStats(allInvestments, pricesCache);
-          
-        } catch (e) {
-          console.error('Error loading admin data:', e);
-          
-          if (e.name === 'AbortError') {
-            tbody.innerHTML = `<tr class="error-row"><td colspan="11">⏱️ Request timed out. The server might be starting up.</td></tr>`;
-            showToast('⏱️ Request timed out. Retrying...', 'error');
-            
-            // Retry after delay
-            if (retry && retryCount < MAX_RETRIES) {
-              retryCount++;
-              setTimeout(() => {
-                loadAdminData(true);
-              }, 2000 * retryCount);
-            }
-          } else {
-            tbody.innerHTML = `
-              <tr class="error-row">
-                <td colspan="11">
-                  ❌ Error loading data: ${e.message}
-                  <br>
-                  <button class="retry-btn" onclick="window.retryLoadData()">🔄 Retry</button>
-                </td>
-              </tr>
-            `;
-            showToast('❌ Failed to load data. Click Retry or Refresh.', 'error');
-          }
-        } finally {
-          isLoading = false;
-        }
-      }
-
-      // Expose retry function globally
-      window.retryLoadData = function() {
-        retryCount = 0;
-        loadAdminData(true);
-      };
-
-      function renderAdminTable(investments, prices) {
-        const tbody = document.getElementById('adminBody');
-        const empty = document.getElementById('adminEmpty');
-        
-        if (!investments || investments.length === 0) {
-          tbody.innerHTML = '';
-          empty.classList.remove('hidden');
-          return;
-        }
-        empty.classList.add('hidden');
-
-        let html = '';
-        investments.forEach(inv => {
-          const priceInfo = prices[inv.symbol] || { price: null, change_pct: null };
-          const currentPrice = priceInfo.price;
-          const costBasis = inv.buy_price * inv.shares;
-          const marketValue = currentPrice ? (currentPrice * inv.shares) : costBasis;
-          const gain = currentPrice ? (marketValue - costBasis) : null;
-          const gainPct = (gain !== null && costBasis > 0) ? (gain / costBasis * 100) : null;
-          const gainClass = gain !== null ? (gain >= 0 ? 'color:#22c55e;' : 'color:#dc2626;') : '';
-          const gainDisplay = gain !== null ? (gain >= 0 ? '+' : '') + gain.toFixed(2) : '—';
-          const pctDisplay = gainPct !== null ? (gainPct >= 0 ? '+' : '') + gainPct.toFixed(1) + '%' : '—';
-
-          html += `
-            <tr data-id="${inv.id}">
-              <td>${inv.id}</td>
-              <td><span class="user-badge">${escapeHtml(inv.user_name)}</span></td>
-              <td>${escapeHtml(inv.email || '—')}</td>
-              <td><strong>${inv.symbol}</strong></td>
-              <td>${inv.shares}</td>
-              <td>$${inv.buy_price.toFixed(2)}</td>
-              <td>$${costBasis.toFixed(2)}</td>
-              <td>${currentPrice !== null ? '$' + currentPrice.toFixed(2) : '—'}</td>
-              <td>$${marketValue.toFixed(2)}</td>
-              <td style="${gainClass}">${gain !== null ? '$' + gainDisplay + ' (' + pctDisplay + ')' : '—'}</td>
-              <td>
-                <div class="actions-cell">
-                  <button class="btn-icon edit" onclick="window.editInvestment(${inv.id})" title="Edit">
-                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                    Edit
-                  </button>
-                  <button class="btn-icon delete" onclick="window.deleteInvestment(${inv.id})" title="Delete">
-                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                    Delete
-                  </button>
-                  <button class="btn-icon create" onclick="window.copyInvestment(${inv.id})" title="Create similar">
-                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    Copy
-                  </button>
+    <!-- ===== HERO ===== -->
+    <div class="hero-wrapper">
+        <div class="hero-bg"></div>
+        <div class="hero">
+            <div class="ticker-wrap">
+                <div class="ticker-track">
+                    <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
+                    <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
+                    <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
+                    <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
+                    <span class="item"><span class="sym">MSFT</span> $415.10 <span class="down">▼ 0.2%</span></span>
+                    <span class="item"><span class="sym">VNQ</span> $89.70 <span class="up">▲ 0.3%</span></span>
+                    <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
+                    <span class="item"><span class="sym">BTC</span> $62,450 <span class="up">▲ 1.8%</span></span>
+                    <span class="item"><span class="sym">AAPL</span> $178.20 <span class="up">▲ 0.6%</span></span>
+                    <span class="item"><span class="sym">TSLA</span> $243.50 <span class="up">▲ 1.2%</span></span>
+                    <span class="item"><span class="sym">NVDA</span> $875.40 <span class="up">▲ 2.4%</span></span>
+                    <span class="item"><span class="sym">MSFT</span> $415.10 <span class="down">▼ 0.2%</span></span>
+                    <span class="item"><span class="sym">VNQ</span> $89.70 <span class="up">▲ 0.3%</span></span>
+                    <span class="item"><span class="sym">ETH</span> $3,210 <span class="up">▲ 0.9%</span></span>
                 </div>
-              </td>
-            </tr>
-          `;
-        });
-        tbody.innerHTML = html;
-      }
-
-      function updateStats(investments, prices) {
-        const totalRows = investments.length;
-        const uniqueUsers = new Set(investments.map(i => i.user_name)).size;
-        let totalInvested = 0;
-        let totalValue = 0;
-        
-        investments.forEach(inv => {
-          const costBasis = inv.buy_price * inv.shares;
-          totalInvested += costBasis;
-          
-          const priceInfo = prices[inv.symbol] || { price: null };
-          if (priceInfo.price !== null) {
-            totalValue += priceInfo.price * inv.shares;
-          } else {
-            totalValue += costBasis;
-          }
-        });
-        
-        document.getElementById('statTotalRows').textContent = totalRows;
-        document.getElementById('statTotalUsers').textContent = uniqueUsers;
-        document.getElementById('statTotalInvested').textContent = '$' + totalInvested.toFixed(2);
-        document.getElementById('statTotalValue').textContent = '$' + totalValue.toFixed(2);
-      }
-
-      async function updateTicker() {
-        const prices = await fetchPrices();
-        const track = document.getElementById('tickerTrack');
-        let html = '';
-        
-        Object.entries(prices).forEach(([symbol, data]) => {
-          const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
-          const arrow = data.change_pct >= 0 ? '▲' : '▼';
-          html += `
-            <div class="ticker-item">
-              <span class="sym">${symbol}</span> 
-              $${data.price ? data.price.toFixed(2) : 'N/A'} 
-              <span class="${changeClass}">${arrow} ${data.change_pct ? data.change_pct.toFixed(1) : '0.0'}%</span>
             </div>
-          `;
-        });
-        
-        track.innerHTML = html + html;
-      }
 
-      // ----- Modal Functions -----
-      const editOverlay = document.getElementById('editModalOverlay');
-      const editId = document.getElementById('editId');
-      const editUserName = document.getElementById('editUserName');
-      const editEmail = document.getElementById('editEmail');
-      const editSymbol = document.getElementById('editSymbol');
-      const editShares = document.getElementById('editShares');
-      const editBuyPrice = document.getElementById('editBuyPrice');
-      const cancelEdit = document.getElementById('cancelEdit');
-      const modalTitleText = document.getElementById('modalTitleText');
-      const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            <div class="hero-left">
+                <div class="hero-badge">🔹 Live charts · Real-time data</div>
+                <h1>Global <span class="highlight">CFD</span> trading<br />5500+ instruments</h1>
+                <p class="sub">Trade stocks, crypto, indices, commodities &amp; more on a transparent, low-cost platform built for every device.</p>
+                <div class="hero-stats-row">
+                    <div class="stat"><div class="num">5500+</div><div class="lbl">Markets</div></div>
+                    <div class="stat"><div class="num">0</div><div class="lbl">Deposit fees</div></div>
+                    <div class="stat"><div class="num">24/7</div><div class="lbl">Human investment</div></div>
+                </div>
+            </div>
 
-      let currentMode = 'edit';
+            <div class="hero-right" id="authCard">
+                <div class="card-title">Start Trading</div>
+                <div class="card-sub">Create your account in 2 minutes</div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="signin">Sign In</button>
+                    <button class="tab-btn" data-tab="register">Register</button>
+                </div>
+                <div class="form-group active" id="signinForm">
+                    <form id="loginForm" novalidate>
+                        <div class="field">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" placeholder="alex@fund.com" required />
+                            <div class="error-msg" id="loginEmailError">Valid email required.</div>
+                        </div>
+                        <div class="field">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" required />
+                            <div class="error-msg" id="loginPasswordError">Password required.</div>
+                        </div>
+                        <button type="submit" class="btn-full" id="loginBtn">Sign In</button>
+                    </form>
+                    <div class="demo-hint">Demo: <span>demo@investdesk.com</span> / <span>demo123</span></div>
+                </div>
+                <div class="form-group" id="registerForm">
+                    <form id="registerFormEl" novalidate>
+                        <div class="field">
+                            <label for="regName">Full name</label>
+                            <input type="text" id="regName" placeholder="Alexandra Chen" required />
+                            <div class="error-msg" id="regNameError">Name required.</div>
+                        </div>
+                        <div class="field">
+                            <label for="regEmail">Email</label>
+                            <input type="email" id="regEmail" placeholder="alex@fund.com" required />
+                            <div class="error-msg" id="regEmailError">Valid email required.</div>
+                            <div class="error-msg" id="regEmailExistsError" style="display:none;">Email already registered.</div>
+                        </div>
+                        <div class="field">
+                            <label for="regPassword">Password</label>
+                            <input type="password" id="regPassword" placeholder="Min 6 characters" required />
+                            <div class="strength-bar"><div class="fill" id="strengthFill"></div></div>
+                            <span class="strength-text" id="strengthText">Password strength</span>
+                            <div class="error-msg" id="regPasswordError">Min 6 characters.</div>
+                        </div>
+                        <div class="field">
+                            <label for="regConfirm">Confirm password</label>
+                            <input type="password" id="regConfirm" placeholder="••••••••" required />
+                            <div class="error-msg" id="regConfirmError">Passwords must match.</div>
+                        </div>
+                        <button type="submit" class="btn-full" id="registerBtn">Create Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      // ----- Edit Investment -----
-      window.editInvestment = function(id) {
-        const inv = allInvestments.find(i => i.id === id);
-        if (inv) {
-          openEditModal(inv, 'edit');
-        } else {
-          showToast('Investment not found. Please refresh.', 'error');
-          loadAdminData();
-        }
-      };
+    <!-- ===== FEATURES SECTION - FULL WIDTH CARDS ===== -->
+    <section class="features-section" id="featuresSection">
+        <div class="section-label">Different pages, <span style="color: #2563eb;">one system</span></div>
+        <div class="section-sub">Multi-platform, all markets, any device. Built for you.</div>
+        <div class="features-grid">
+            <!-- 📈 Trade -->
+            <div class="feature-card" id="trade-card">
+                <div class="card-left">
+                    <span class="icon">📈</span>
+                    <div class="card-content">
+                        <h3>Trade</h3>
+                        <div class="desc">Spot, futures &amp; options. Advanced order types, trailing stops, real-time P&amp;L. Access 5500+ global markets with ultra-low latency execution and deep liquidity.</div>
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="stat-row">
+                        <span><strong>0.0</strong> spread</span>
+                        <span><strong>1:30</strong> leverage</span>
+                    </div>
+                    <span class="badge">Instant execution</span>
+                </div>
+            </div>
+            <!-- 🌍 Markets -->
+            <div class="feature-card" id="markets-card">
+                <div class="card-left">
+                    <span class="icon">🌍</span>
+                    <div class="card-content">
+                        <h3>Markets</h3>
+                        <div class="desc">5500+ instruments: indices, FX, crypto, commodities, shares &amp; ETFs. Trade on 70+ exchanges worldwide with 24/7 crypto access and institutional-grade liquidity.</div>
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="stat-row">
+                        <span><strong>24/7</strong> crypto</span>
+                        <span><strong>70+</strong> exchanges</span>
+                    </div>
+                    <span class="badge">Deep liquidity</span>
+                </div>
+            </div>
+            <!-- ⚙️ Platform -->
+            <div class="feature-card" id="platform-card">
+                <div class="card-left">
+                    <span class="icon">⚙️</span>
+                    <div class="card-content">
+                        <h3>Platform</h3>
+                        <div class="desc">Web, mobile, API. Advanced charting with 50+ indicators, real-time alerts, comprehensive risk management tools, and detailed portfolio analytics.</div>
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="stat-row">
+                        <span><strong>50+</strong> indicators</span>
+                        <span><strong>10</strong> timeframes</span>
+                    </div>
+                    <span class="badge">Custom dashboards</span>
+                </div>
+            </div>
+            <!-- 💰 Pricing -->
+            <div class="feature-card" id="pricing-card">
+                <div class="card-left">
+                    <span class="icon">💰</span>
+                    <div class="card-content">
+                        <h3>Pricing</h3>
+                        <div class="desc">Transparent fees, zero deposit fees, low commissions &amp; competitive spreads. No hidden costs, no account maintenance fees, and 0.1% withdrawal fee.</div>
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="stat-row">
+                        <span><strong>$0</strong> deposit</span>
+                        <span><strong>0.1%</strong> withdrawal</span>
+                    </div>
+                    <span class="badge">No hidden costs</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      // ----- Delete Investment -----
-      window.deleteInvestment = async function(id) {
-        if (!confirm('Delete this investment record?')) return;
-        
-        try {
-          const res = await fetch(`/api/admin/investments/${id}`, { 
-            method: 'DELETE',
-            credentials: 'same-origin'
-          });
-          
-          if (res.status === 401) {
-            showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-            return;
-          }
-          
-          if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Delete failed');
-          }
-          
-          showToast('Investment deleted.', 'success');
-          await loadAdminData();
-          await updateTicker();
-          
-          // Notify dashboard
-          if (window.opener && !window.opener.closed) {
-            try {
-              window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
-            } catch (e) {}
-          }
-        } catch (e) {
-          console.error('Delete error:', e);
-          showToast(e.message || 'Error deleting.', 'error');
-        }
-      };
+    <!-- ===== LIVE CHARTS SECTION - TRADING STYLE ===== -->
+    <section class="charts-section" id="chartsSection">
+        <div class="section-label">Live <span style="color: #2563eb;">market</span> data</div>
+        <div class="section-sub">Real-time price action for the top 3 instruments</div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="name">₿ BTC/USD</span>
+                    <span><span class="price" id="btcPrice">$62,450</span> <span class="change up" id="btcChange">+1.8%</span></span>
+                </div>
+                <div class="chart-container"><canvas id="btcChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="name">🍎 AAPL</span>
+                    <span><span class="price" id="aaplPrice">$178.20</span> <span class="change up" id="aaplChange">+0.6%</span></span>
+                </div>
+                <div class="chart-container"><canvas id="aaplChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="name">🚗 TSLA</span>
+                    <span><span class="price" id="tslaPrice">$243.50</span> <span class="change up" id="tslaChange">+1.2%</span></span>
+                </div>
+                <div class="chart-container"><canvas id="tslaChart"></canvas></div>
+            </div>
+        </div>
+    </section>
 
-      // ----- Copy Investment -----
-      window.copyInvestment = function(id) {
-        const inv = allInvestments.find(i => i.id === id);
-        if (inv) {
-          const copy = { 
-            ...inv, 
-            id: null
-          };
-          openEditModal(copy, 'create');
-        }
-      };
+    <!-- ===== CONTACT SECTION ===== -->
+    <section class="contact-section" id="contactSection">
+        <div class="section-label">Get in <span style="color: #2563eb;">touch</span></div>
+        <div class="section-sub">We're here to help you 24/7</div>
+        <div class="contact-grid">
+            <div class="contact-item">
+                <div class="icon">📧</div>
+                <div class="info">
+                    <span class="label">Email</span>
+                    <span class="value"><a href="mailto:investmentgroupofcompany37@gmail.com">investmentgroupofcompany37@gmail.com</a></span>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="icon">📱</div>
+                <div class="info">
+                    <span class="label">WhatsApp</span>
+                    <span class="value"><a href="https://wa.me/16693627747" target="_blank">+1 669 362 7747</a></span>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="icon">📞</div>
+                <div class="info">
+                    <span class="label">Phone</span>
+                    <span class="value"><a href="tel:+16693627747">+1 669 362 7747</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      // ----- Open Edit Modal -----
-      function openEditModal(inv, mode = 'edit') {
-        currentMode = mode;
-        if (mode === 'create') {
-          modalTitleText.textContent = 'Create New Investment';
-          modalSubmitBtn.textContent = 'Create';
-          editId.value = '';
-          editUserName.value = inv.user_name || '';
-          editEmail.value = inv.email || '';
-          editSymbol.value = inv.symbol || 'TSLA';
-          editShares.value = inv.shares || 1;
-          editBuyPrice.value = inv.buy_price || 100;
-        } else {
-          modalTitleText.textContent = 'Edit Investment';
-          modalSubmitBtn.textContent = 'Save Changes';
-          editId.value = inv.id;
-          editUserName.value = inv.user_name;
-          editEmail.value = inv.email || '';
-          editSymbol.value = inv.symbol;
-          editShares.value = inv.shares;
-          editBuyPrice.value = inv.buy_price;
-        }
-        editOverlay.classList.remove('hidden');
-      }
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials-section">
+        <div class="section-label">What our <span style="color: #2563eb;">Investors</span> say</div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="person">
+                    <img class="avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah" />
+                    <div><div class="name">Sarah Kaur</div><div class="role">Angel Investor</div></div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <div class="quote">"The platform is intuitive. I love the live data and the clean interface."</div>
+                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="person">
+                    <img class="avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="David" />
+                    <div><div class="name">David Roth</div><div class="role">Tech Founder</div></div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <div class="quote">"Transparent fees and great execution. I've recommended it to my entire network."</div>
+                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="person">
+                    <img class="avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Elena" />
+                    <div><div class="name">Elena Marchetti</div><div class="role">Portfolio Manager</div></div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <div class="quote">"A beautiful dashboard with real depth. The risk tools are exactly what I need."</div>
+                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="person">
+                    <img class="avatar" src="https://randomuser.me/api/portraits/men/46.jpg" alt="James" />
+                    <div><div class="name">James Okafor</div><div class="role">Financial Advisor</div></div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <div class="quote">"My clients love the clarity. It's become an essential part of my advisory workflow."</div>
+                <div class="check"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verified</div>
+            </div>
+        </div>
+    </section>
 
-      cancelEdit.addEventListener('click', () => editOverlay.classList.add('hidden'));
-      editOverlay.addEventListener('click', (e) => { 
-        if (e.target === editOverlay) editOverlay.classList.add('hidden'); 
-      });
+    <!-- ===== WHATSAPP CHAT BUTTON ===== -->
+    <div class="whatsapp-chat">
+        <a href="https://wa.me/16693627747" target="_blank" class="whatsapp-btn" id="whatsappBtn">
+            <span class="icon">💬</span>
+            <span class="label">
+                <span>Chat with us</span>
+                <span class="small">We reply in minutes</span>
+            </span>
+        </a>
+    </div>
 
-      // ----- Submit Edit Form -----
-      document.getElementById('editForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const symbol = editSymbol.value;
-        if (!ALLOWED_SYMBOLS.includes(symbol)) {
-          showToast('Only TSLA, AAPL, NVDA, MSFT are allowed.', 'error');
-          return;
-        }
-        
-        const payload = {
-          user_name: editUserName.value.trim(),
-          email: editEmail.value.trim(),
-          symbol: symbol,
-          shares: parseFloat(editShares.value),
-          buy_price: parseFloat(editBuyPrice.value)
-        };
+    <!-- ===== RISK FOOTER ===== -->
+    <footer class="risk-footer">
+        <p>
+            <strong>Risk warning:</strong> CFDs are complex instruments and come with a high risk of losing money rapidly due to leverage.
+            <span class="highlight">78.48% of retail investors lose money</span> when trading CFDs with this provider.
+            You should consider whether you understand how CFDs work and whether you can afford to take the high risk of losing your money.
+        </p>
+        <p style="margin-top: 0.8rem; color: #94a3b8;">
+            InvestDesk is a trading name of Capital Com Online Investments Ltd, regulated by the SCB (License SIA-F245).
+            © 2026 InvestDesk. All rights reserved.
+        </p>
+    </footer>
 
-        if (isNaN(payload.shares) || isNaN(payload.buy_price) || payload.shares <= 0 || payload.buy_price <= 0) {
-          showToast('Please enter valid numbers for shares and buy price.', 'error');
-          return;
-        }
-
-        const submitBtn = document.getElementById('modalSubmitBtn');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Saving...';
-
-        try {
-          let url, method;
-          if (currentMode === 'create') {
-            url = '/api/admin/investments';
-            method = 'POST';
-          } else {
-            const id = parseInt(editId.value);
-            if (!id || isNaN(id)) { 
-              showToast('Invalid record ID.', 'error'); 
-              submitBtn.disabled = false;
-              submitBtn.textContent = originalText;
-              return; 
+    <script>
+        (function() {
+            const toast = document.getElementById('toast');
+            let toastTimer = null;
+            function showToast(msg, type = 'success') {
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.textContent = msg;
+                toast.className = 'toast ' + type + ' show';
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
             }
-            url = `/api/admin/investments/${id}`;
-            method = 'PUT';
-          }
 
-          const res = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify(payload)
-          });
-          
-          if (res.status === 401) {
-            showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-            return;
-          }
-          
-          const responseText = await res.text();
-          let responseData;
-          try {
-            responseData = JSON.parse(responseText);
-          } catch (parseError) {
-            throw new Error('Server returned invalid response.');
-          }
-          
-          if (!res.ok) {
-            throw new Error(responseData.error || 'Operation failed');
-          }
-          
-          editOverlay.classList.add('hidden');
-          showToast(currentMode === 'create' ? '✅ Investment created!' : '✅ Investment updated!', 'success');
-          
-          await loadAdminData();
-          await updateTicker();
-          
-          // Notify dashboard
-          if (window.opener && !window.opener.closed) {
-            try {
-              window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
-            } catch (e) {}
-          }
-        } catch (e) {
-          console.error('Error saving investment:', e);
-          showToast('❌ ' + (e.message || 'Error saving investment.'), 'error');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-      });
+            // ============================================================
+            // NAV CARD SCROLL
+            // ============================================================
+            document.querySelectorAll('.nav-card[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetEl = document.querySelector(targetId);
+                    if (targetEl) {
+                        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('highlight-card'));
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetEl.classList.add('highlight-card');
+                        setTimeout(() => targetEl.classList.remove('highlight-card'), 2000);
+                    }
+                });
+            });
 
-      // ----- Reset Database -----
-      document.getElementById('resetDbBtn').addEventListener('click', async function() {
-        if (!confirm('⚠️ This will delete ALL investment data and reset the database. Are you sure?')) return;
-        if (!confirm('⚠️⚠️ This action cannot be undone! All investments will be permanently deleted. Continue?')) return;
-        
-        try {
-          const btn = this;
-          const originalText = btn.textContent;
-          btn.disabled = true;
-          btn.textContent = 'Resetting...';
-          
-          const res = await fetch('/api/admin/reset-db', {
-            method: 'POST',
-            credentials: 'same-origin'
-          });
-          
-          const data = await res.json();
-          
-          if (res.ok) {
-            showToast('✅ Database reset successfully!', 'success');
-            await loadAdminData();
-            await updateTicker();
-          } else {
-            throw new Error(data.error || 'Failed to reset database');
-          }
-          
-          btn.disabled = false;
-          btn.textContent = originalText;
-        } catch (e) {
-          console.error('Reset DB error:', e);
-          showToast('❌ ' + e.message, 'error');
-        }
-      });
+            // ============================================================
+            // LOGIN / REGISTER NAV
+            // ============================================================
+            const loginNavBtn = document.getElementById('loginNavBtn');
+            const getStartedBtn = document.getElementById('getStartedBtn');
+            const authCard = document.getElementById('authCard');
+            if (loginNavBtn) {
+                loginNavBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.querySelector('.tab-btn[data-tab="signin"]').click();
+                });
+            }
+            if (getStartedBtn) {
+                getStartedBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    authCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.querySelector('.tab-btn[data-tab="register"]').click();
+                });
+            }
 
-      // ----- Create New -----
-      document.getElementById('createBtn').addEventListener('click', function() {
-        const blank = { user_name: '', email: '', symbol: 'TSLA', shares: 1, buy_price: 100 };
-        openEditModal(blank, 'create');
-      });
+            // ============================================================
+            // TABS
+            // ============================================================
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const forms = { signin: document.getElementById('signinForm'), register: document.getElementById('registerForm') };
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = this.dataset.tab;
+                    Object.keys(forms).forEach(key => forms[key].classList.toggle('active', key === target));
+                    document.querySelectorAll('.field input').forEach(inp => inp.classList.remove('error', 'success'));
+                    document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+                    document.getElementById('regEmailExistsError').style.display = 'none';
+                });
+            });
 
-      // ----- Refresh -----
-      document.getElementById('refreshBtn').addEventListener('click', async function() {
-        retryCount = 0;
-        await loadAdminData();
-        await updateTicker();
-        showToast('Refreshed!', 'success');
-      });
+            // ============================================================
+            // HELPERS
+            // ============================================================
+            function setFieldError(input, errEl, condition) {
+                if (condition) { input.classList.add('error'); input.classList.remove('success'); errEl.classList.add('show'); } 
+                else { input.classList.remove('error'); errEl.classList.remove('show'); }
+            }
+            function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
-      // ----- Helpers -----
-      function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-      }
+            // ============================================================
+            // PASSWORD STRENGTH
+            // ============================================================
+            const regPassword = document.getElementById('regPassword');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            regPassword.addEventListener('input', function() {
+                const pwd = this.value;
+                let strength = 0;
+                if (pwd.length >= 6) strength++;
+                if (pwd.length >= 10) strength++;
+                if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) strength++;
+                if (/\d/.test(pwd)) strength++;
+                if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
+                if (pwd.length === 0) {
+                    strengthFill.style.width = '0%'; strengthFill.style.background = '#e2e8f0';
+                    strengthText.textContent = 'Password strength'; strengthText.style.color = '#64748b';
+                    return;
+                }
+                let width, color, label;
+                if (strength <= 1) { width = '25%'; color = '#ef4444'; label = 'Weak'; } 
+                else if (strength === 2) { width = '50%'; color = '#f59e0b'; label = 'Fair'; } 
+                else if (strength === 3) { width = '75%'; color = '#3b82f6'; label = 'Good'; } 
+                else { width = '100%'; color = '#22c55e'; label = 'Strong'; }
+                strengthFill.style.width = width; strengthFill.style.background = color;
+                strengthText.textContent = label; strengthText.style.color = color;
+            });
 
-      // ----- Init -----
-      checkAdminSession();
+            // ============================================================
+            // DEMO USERS - Fixed storage
+            // ============================================================
+            function getUsers() { 
+                try {
+                    const data = localStorage.getItem('investdesk_users'); 
+                    return data ? JSON.parse(data) : []; 
+                } catch(e) { return []; }
+            }
+            function saveUsers(users) { 
+                localStorage.setItem('investdesk_users', JSON.stringify(users)); 
+            }
+            
+            // Initialize with demo users if empty
+            if (getUsers().length === 0) {
+                saveUsers([
+                    { name: 'Demo User', email: 'demo@investdesk.com', password: 'demo123' },
+                    { name: 'Admin', email: 'admin@investdesk.com', password: 'admin123' }
+                ]);
+            }
 
-      // Auto-refresh every 30 seconds
-      setInterval(async () => {
-        if (!adminShell.classList.contains('hidden')) {
-          await loadAdminData(false);
-          await updateTicker();
-        }
-      }, 30000);
-    })();
-  </script>
+            // ============================================================
+            // LOGIN - Fixed to work properly
+            // ============================================================
+            const loginForm = document.getElementById('loginForm');
+            const loginEmail = document.getElementById('loginEmail');
+            const loginPassword = document.getElementById('loginPassword');
+            const loginEmailErr = document.getElementById('loginEmailError');
+            const loginPassErr = document.getElementById('loginPasswordError');
+            
+            // Pre-fill demo credentials
+            loginEmail.value = 'demo@investdesk.com';
+            loginPassword.value = 'demo123';
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = loginEmail.value.trim();
+                const password = loginPassword.value.trim();
+                const emailOk = validateEmail(email);
+                const passOk = password.length > 0;
+                
+                // Validate inputs
+                setFieldError(loginEmail, loginEmailErr, !emailOk);
+                setFieldError(loginPassword, loginPassErr, !passOk);
+                
+                if (!emailOk || !passOk) {
+                    showToast('Please fix the errors.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                const btn = document.getElementById('loginBtn');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Signing in…';
+                
+                // Simulate network delay
+                setTimeout(() => {
+                    const users = getUsers();
+                    const user = users.find(u => u.email === email && u.password === password);
+                    
+                    if (user) {
+                        showToast('✅ Welcome back, ' + user.name + '!', 'success');
+                        sessionStorage.setItem('investdesk_user', JSON.stringify(user));
+                        
+                        // Redirect to dashboard after brief delay
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 600);
+                    } else {
+                        showToast('❌ Invalid email or password. Try demo@investdesk.com / demo123', 'error');
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                    }
+                }, 800);
+            });
+
+            // ============================================================
+            // REGISTER - Fixed to work properly
+            // ============================================================
+            const regForm = document.getElementById('registerFormEl');
+            const regName = document.getElementById('regName');
+            const regEmail = document.getElementById('regEmail');
+            const regConfirm = document.getElementById('regConfirm');
+            const regNameErr = document.getElementById('regNameError');
+            const regEmailErr = document.getElementById('regEmailError');
+            const regEmailExistsErr = document.getElementById('regEmailExistsError');
+            const regPassErr = document.getElementById('regPasswordError');
+            const regConfirmErr = document.getElementById('regConfirmError');
+            
+            regForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = regName.value.trim();
+                const email = regEmail.value.trim();
+                const password = regPassword.value.trim();
+                const confirm = regConfirm.value.trim();
+                
+                const nameOk = name.length > 0;
+                const emailOk = validateEmail(email);
+                const passOk = password.length >= 6;
+                const confirmOk = password === confirm && passOk;
+                
+                // Check if email exists
+                const users = getUsers();
+                const emailExists = users.some(u => u.email === email);
+                
+                // Validate all fields
+                setFieldError(regName, regNameErr, !nameOk);
+                setFieldError(regEmail, regEmailErr, !emailOk);
+                setFieldError(regPassword, regPassErr, !passOk);
+                setFieldError(regConfirm, regConfirmErr, !confirmOk);
+                
+                // Email exists validation
+                if (emailOk && emailExists) {
+                    regEmail.classList.add('error');
+                    regEmailExistsErr.style.display = 'block';
+                } else {
+                    regEmailExistsErr.style.display = 'none';
+                }
+                
+                // Check if any errors
+                if (!nameOk || !emailOk || !passOk || !confirmOk || emailExists) {
+                    showToast('Please fix the errors.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                const btn = document.getElementById('registerBtn');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Creating…';
+                
+                // Simulate network delay
+                setTimeout(() => {
+                    const newUser = { name, email, password };
+                    const updatedUsers = getUsers();
+                    updatedUsers.push(newUser);
+                    saveUsers(updatedUsers);
+                    
+                    // Store session
+                    sessionStorage.setItem('investdesk_user', JSON.stringify(newUser));
+                    showToast('✅ Account created! Welcome ' + name, 'success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 700);
+                }, 900);
+            });
+
+            // ============================================================
+            // LIVE CHARTS - TRADING STYLE
+            // ============================================================
+            function generateRandomData(base, volatility, points = 40) {
+                const data = [];
+                let current = base;
+                for (let i = 0; i < points; i++) {
+                    const change = (Math.random() - 0.5) * volatility * 2.5;
+                    current = Math.max(current * (1 + change / 100), base * 0.5);
+                    data.push(current);
+                }
+                return data;
+            }
+
+            const chartConfigs = [
+                { id: 'btcChart', label: 'BTC', base: 62450, vol: 2.0, priceId: 'btcPrice', changeId: 'btcChange', color: '#F7931A' },
+                { id: 'aaplChart', label: 'AAPL', base: 178.20, vol: 1.5, priceId: 'aaplPrice', changeId: 'aaplChange', color: '#A2AAAD' },
+                { id: 'tslaChart', label: 'TSLA', base: 243.50, vol: 2.5, priceId: 'tslaPrice', changeId: 'tslaChange', color: '#E82127' }
+            ];
+
+            const charts = {};
+            chartConfigs.forEach(cfg => {
+                const ctx = document.getElementById(cfg.id).getContext('2d');
+                const initialData = generateRandomData(cfg.base, cfg.vol, 40);
+                
+                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, cfg.color + '40');
+                gradient.addColorStop(1, cfg.color + '00');
+
+                charts[cfg.id] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({ length: 40 }, (_, i) => i + 1),
+                        datasets: [{
+                            label: cfg.label,
+                            data: initialData,
+                            borderColor: cfg.color,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0b1a2f',
+                                titleColor: '#e2e8f0',
+                                bodyColor: '#ffffff',
+                                borderColor: '#1e2d45',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '$' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                grid: { color: '#1e2d45', display: true }, 
+                                ticks: { display: false } 
+                            },
+                            y: { 
+                                grid: { color: '#1e2d45', display: true }, 
+                                ticks: { 
+                                    display: false,
+                                    color: '#94a3b8'
+                                } 
+                            }
+                        },
+                        interaction: { intersect: false, mode: 'index' }
+                    }
+                });
+
+                const lastPrice = initialData[initialData.length - 1];
+                const change = ((lastPrice - cfg.base) / cfg.base * 100);
+                document.getElementById(cfg.priceId).textContent = '$' + lastPrice.toFixed(2);
+                const changeEl = document.getElementById(cfg.changeId);
+                changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+                changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
+            });
+
+            // Update charts every 2 seconds
+            setInterval(() => {
+                chartConfigs.forEach(cfg => {
+                    const chart = charts[cfg.id];
+                    if (!chart) return;
+                    const data = chart.data.datasets[0].data;
+                    const last = data[data.length - 1];
+                    const change = (Math.random() - 0.5) * cfg.vol * 1.5;
+                    let newVal = last * (1 + change / 100);
+                    newVal = Math.max(newVal, cfg.base * 0.4);
+                    data.push(newVal);
+                    data.shift();
+                    chart.update('none');
+
+                    const lastPrice = data[data.length - 1];
+                    const changePercent = ((lastPrice - cfg.base) / cfg.base * 100);
+                    document.getElementById(cfg.priceId).textContent = '$' + lastPrice.toFixed(2);
+                    const changeEl = document.getElementById(cfg.changeId);
+                    changeEl.textContent = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(1) + '%';
+                    changeEl.className = 'change ' + (changePercent >= 0 ? 'up' : 'down');
+                });
+            }, 2000);
+
+            // ============================================================
+            // SESSION CHECK - Redirect if already logged in
+            // ============================================================
+            const existingUser = sessionStorage.getItem('investdesk_user');
+            if (existingUser && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
+                window.location.href = '/dashboard';
+            }
+        })();
+    </script>
+
 </body>
-</html>
+</html> v 
