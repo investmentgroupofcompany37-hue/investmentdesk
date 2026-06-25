@@ -267,11 +267,13 @@ def fetch_price(symbol):
 
 @app.route("/")
 def index():
+    """Serve the index page (login/register)"""
     return send_from_directory("templates", "index.html")
 
 
 @app.route("/dashboard")
 def dashboard():
+    """Serve the dashboard page - requires user login"""
     # Check if user is logged in
     user = session.get("user")
     if not user:
@@ -281,9 +283,8 @@ def dashboard():
 
 @app.route("/admin")
 def admin_page():
-    # Only allow access if user is admin
-    if not session.get("is_admin"):
-        return redirect(url_for('index'))
+    """Serve the admin page - accessible without redirect (has its own login)"""
+    # Serve admin.html directly - it has its own login page
     return send_from_directory("templates", "admin.html")
 
 
@@ -469,6 +470,7 @@ def create_investment():
 
 @app.route("/api/admin/login", methods=["POST"])
 def admin_login():
+    """Admin login - sets session cookie"""
     try:
         payload = request.get_json(force=True) or {}
     except Exception as e:
@@ -491,6 +493,7 @@ def admin_logout():
 
 @app.route("/api/admin/session")
 def admin_session():
+    """Check if admin is logged in"""
     try:
         return jsonify({"is_admin": bool(session.get("is_admin"))})
     except Exception as e:
@@ -505,6 +508,7 @@ def admin_session():
 @app.route("/api/admin/investments", methods=["GET"])
 @admin_required
 def admin_list_investments():
+    """Admin gets all investments - requires admin login"""
     try:
         # Ensure tables exist before querying
         ensure_tables()
