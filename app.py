@@ -374,6 +374,14 @@ def logout():
     return jsonify({"ok": True})
 
 
+@app.route("/api/session", methods=["GET"])
+def session_check():
+    """Check if user is logged in."""
+    if session.get("user"):
+        return jsonify({"logged_in": True, "user": session["user"]})
+    return jsonify({"logged_in": False})
+
+
 # ---------------------------------------------------------------------------
 # Routes — live prices
 # ---------------------------------------------------------------------------
@@ -399,12 +407,10 @@ def list_investments():
     """Return investments belonging to the currently logged-in user only."""
     try:
         user_email = session["user"]["email"]
-        user_name = session["user"]["name"]
         db = get_db()
-        # Try to fetch by email first (primary key), fallback to user_name
         rows = db.execute(
-            "SELECT * FROM investments WHERE email = ? OR user_name = ? ORDER BY created_at DESC",
-            (user_email, user_name),
+            "SELECT * FROM investments WHERE email = ? ORDER BY created_at DESC",
+            (user_email,),
         ).fetchall()
         return jsonify([dict(r) for r in rows])
     except Exception as e:
