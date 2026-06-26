@@ -291,8 +291,7 @@ def dashboard():
 
 @app.route("/admin")
 def admin_page():
-    if not session.get("is_admin"):
-        return redirect(url_for("index"))
+    # Don't redirect - let the frontend handle the login
     return send_from_directory("templates", "admin.html")
 
 
