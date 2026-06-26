@@ -552,14 +552,15 @@
 <body>
   <div class="toast" id="toast"></div>
 
-  <!-- LOGIN -->
+  <!-- LOGIN - Always shown first -->
   <div class="login-shell" id="loginShell">
     <div class="login-card">
       <div class="mark">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
         INVESTDESK
       </div>
-      <h1>Admin sign in</h1>
+      <h1>Admin Access</h1>
+      <p style="text-align:center;color:#64748b;font-size:0.85rem;margin-bottom:1.2rem;">Enter your administrator credentials</p>
       <div class="login-error" id="loginError"></div>
       <form id="loginForm">
         <div class="field">
@@ -570,12 +571,18 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" value="admin123" autocomplete="current-password" required />
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">Sign in</button>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">
+          <span id="loginBtnText">Sign in</span>
+          <span class="loading-spinner hidden" id="loginSpinner" style="display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 0.6s ease-in-out infinite;"></span>
+        </button>
       </form>
+      <div style="margin-top:1rem;text-align:center;font-size:0.7rem;color:#94a3b8;">
+        <a href="/" style="color:#2563eb;text-decoration:none;">← Back to homepage</a>
+      </div>
     </div>
   </div>
 
-  <!-- ADMIN SHELL -->
+  <!-- ADMIN SHELL - Only shown after successful admin login -->
   <div class="hidden" id="adminShell">
     <div class="admin-wrapper">
       <div class="ticker-tape">
@@ -602,7 +609,7 @@
             </a>
           </nav>
           <div class="rail-foot">
-            <button class="btn btn-sm" id="logoutBtn" style="width:100%;">Sign out</button>
+            <button class="btn btn-sm btn-danger" id="logoutBtn" style="width:100%;">Sign out</button>
           </div>
         </aside>
 
@@ -728,6 +735,21 @@
     </div>
   </div>
 
+  <style>
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.6s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
   <script>
     (function() {
       const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
@@ -762,58 +784,36 @@
         errorBanner.classList.remove('show');
       }
 
-      // ----- Auth -----
+      // ----- DOM Elements -----
       const loginShell = document.getElementById('loginShell');
       const adminShell = document.getElementById('adminShell');
       const loginError = document.getElementById('loginError');
       const loginForm = document.getElementById('loginForm');
       const loginUsername = document.getElementById('loginUsername');
       const loginPassword = document.getElementById('loginPassword');
+      const loginBtnText = document.getElementById('loginBtnText');
+      const loginSpinner = document.getElementById('loginSpinner');
 
-      async function checkAdminSession() {
-        try {
-          const res = await fetch('/api/admin/session', {
-            credentials: 'same-origin'
-          });
-          const data = await res.json();
-          if (data.is_admin) {
-            loginShell.classList.add('hidden');
-            adminShell.classList.remove('hidden');
-            hideError();
-            await loadAdminData();
-            await updateTicker();
-            // Start auto-refresh
-            if (refreshInterval) clearInterval(refreshInterval);
-            refreshInterval = setInterval(async () => {
-              if (!adminShell.classList.contains('hidden')) {
-                await loadAdminData(false);
-                await updateTicker();
-              }
-            }, 30000);
-          } else {
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-            if (refreshInterval) clearInterval(refreshInterval);
-          }
-        } catch (e) {
-          console.error('Session check error:', e);
-          loginShell.classList.remove('hidden');
-          adminShell.classList.add('hidden');
-          if (refreshInterval) clearInterval(refreshInterval);
-        }
-      }
-
+      // ----- Admin Login -----
       loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         loginError.classList.remove('show');
         loginError.textContent = '';
+        
         const username = loginUsername.value.trim();
         const password = loginPassword.value.trim();
+        
         if (!username || !password) {
           loginError.textContent = 'Please enter both username and password.';
           loginError.classList.add('show');
           return;
         }
+
+        // Show loading state
+        loginBtnText.textContent = 'Signing in...';
+        loginSpinner.style.display = 'inline-block';
+        loginForm.querySelector('button[type="submit"]').disabled = true;
+
         try {
           const res = await fetch('/api/admin/login', {
             method: 'POST',
@@ -822,13 +822,14 @@
             body: JSON.stringify({ username, password })
           });
           const data = await res.json();
+          
           if (data.ok) {
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
-            hideError();
-            showToast('Welcome, Admin!', 'success');
+            showToast('✅ Welcome, Admin!', 'success');
             await loadAdminData();
             await updateTicker();
+            
             // Start auto-refresh
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(async () => {
@@ -840,14 +841,28 @@
           } else {
             loginError.textContent = data.error || 'Invalid username or password.';
             loginError.classList.add('show');
+            loginPassword.value = '';
+            loginPassword.focus();
           }
         } catch (e) {
           console.error('Login error:', e);
           loginError.textContent = 'Network error. Please try again.';
           loginError.classList.add('show');
+        } finally {
+          loginBtnText.textContent = 'Sign in';
+          loginSpinner.style.display = 'none';
+          loginForm.querySelector('button[type="submit"]').disabled = false;
         }
       });
 
+      // Allow Enter key to submit
+      loginPassword.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          loginForm.dispatchEvent(new Event('submit'));
+        }
+      });
+
+      // ----- Logout -----
       document.getElementById('logoutBtn').addEventListener('click', async function() {
         try { 
           await fetch('/api/admin/logout', { 
@@ -855,9 +870,11 @@
             credentials: 'same-origin'
           }); 
         } catch (e) {}
+        
         if (refreshInterval) clearInterval(refreshInterval);
-        loginShell.classList.remove('hidden');
         adminShell.classList.add('hidden');
+        loginShell.classList.remove('hidden');
+        loginPassword.value = '';
         showToast('Signed out.', 'success');
       });
 
@@ -909,8 +926,8 @@
           
           if (invRes.status === 401) {
             showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            loginShell.classList.remove('hidden');
             if (refreshInterval) clearInterval(refreshInterval);
             isLoading = false;
             return;
@@ -1125,8 +1142,8 @@
           
           if (res.status === 401) {
             showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            loginShell.classList.remove('hidden');
             if (refreshInterval) clearInterval(refreshInterval);
             return;
           }
@@ -1248,8 +1265,8 @@
           
           if (res.status === 401) {
             showToast('Session expired. Please login again.', 'error');
-            loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
+            loginShell.classList.remove('hidden');
             if (refreshInterval) clearInterval(refreshInterval);
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
@@ -1346,8 +1363,10 @@
         return div.innerHTML;
       }
 
-      // ----- Init -----
-      checkAdminSession();
+      // ----- Init - Always show login form first -----
+      // The login shell is visible by default, admin shell is hidden
+      // No auto-check for admin session - user must login manually
+      console.log('Admin page loaded - please login');
     })();
   </script>
 </body>
