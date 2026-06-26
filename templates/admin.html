@@ -564,11 +564,11 @@
       <form id="loginForm">
         <div class="field">
           <label for="loginUsername">Username</label>
-          <input type="text" id="loginUsername" autocomplete="username" required />
+          <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" required />
         </div>
         <div class="field">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" autocomplete="current-password" required />
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">
           <span id="loginBtnText">Sign in</span>
@@ -751,7 +751,7 @@
 
   <script>
     (function() {
-      // ─── HARDCODED ADMIN CREDENTIALS (server-side auth still used) ───
+      // ─── HARDCODED ADMIN CREDENTIALS (matches server) ───
       const ADMIN_CREDENTIALS = {
         username: 'admin',
         password: 'admin123'
@@ -799,7 +799,7 @@
       const loginBtnText = document.getElementById('loginBtnText');
       const loginSpinner = document.getElementById('loginSpinner');
 
-      // ----- Admin Login (Hardcoded credentials + Server-side auth) -----
+      // ----- Admin Login (Server-side auth) -----
       loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         loginError.classList.remove('show');
@@ -814,16 +814,7 @@
           return;
         }
 
-        // ─── FIRST: Validate against hardcoded credentials ───
-        if (username !== ADMIN_CREDENTIALS.username || password !== ADMIN_CREDENTIALS.password) {
-          loginError.textContent = 'Invalid username or password.';
-          loginError.classList.add('show');
-          loginPassword.value = '';
-          loginPassword.focus();
-          return;
-        }
-
-        // ─── SECOND: Authenticate with server ───
+        // Show loading state
         loginBtnText.textContent = 'Signing in...';
         loginSpinner.style.display = 'inline-block';
         loginForm.querySelector('button[type="submit"]').disabled = true;
@@ -853,7 +844,7 @@
               }
             }, 30000);
           } else {
-            loginError.textContent = data.error || 'Server authentication failed.';
+            loginError.textContent = data.error || 'Invalid username or password.';
             loginError.classList.add('show');
             loginPassword.value = '';
             loginPassword.focus();
@@ -1366,8 +1357,8 @@
       }
 
       // ----- Check for existing admin session (via sessionStorage) -----
+      // Verify session is still valid with server
       if (sessionStorage.getItem('admin_logged_in') === 'true') {
-        // Verify session is still valid with server
         fetch('/api/admin/investments', { credentials: 'same-origin' })
           .then(res => {
             if (res.status === 401) {
@@ -1390,13 +1381,13 @@
             }
           })
           .catch(() => {
-            // If server check fails, still show login
+            // If server check fails, show login
             loginShell.classList.remove('hidden');
             adminShell.classList.add('hidden');
           });
       }
 
-      console.log('Admin page loaded - hardcoded credentials: admin / admin123');
+      console.log('Admin page loaded - use admin / admin123');
     })();
   </script>
 </body>
