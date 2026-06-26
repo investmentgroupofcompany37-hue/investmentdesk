@@ -560,16 +560,15 @@
         INVESTDESK
       </div>
       <h1>Admin Access</h1>
-      <p style="text-align:center;color:#64748b;font-size:0.85rem;margin-bottom:1.2rem;">Enter your administrator credentials</p>
       <div class="login-error" id="loginError"></div>
       <form id="loginForm">
         <div class="field">
           <label for="loginUsername">Username</label>
-          <input type="text" id="loginUsername" value="admin" autocomplete="username" required />
+          <input type="text" id="loginUsername" autocomplete="username" required />
         </div>
         <div class="field">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" value="admin123" autocomplete="current-password" required />
+          <input type="password" id="loginPassword" autocomplete="current-password" required />
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">
           <span id="loginBtnText">Sign in</span>
@@ -752,6 +751,12 @@
 
   <script>
     (function() {
+      // ─── HARDCODED ADMIN CREDENTIALS (server-side auth still used) ───
+      const ADMIN_CREDENTIALS = {
+        username: 'admin',
+        password: 'admin123'
+      };
+
       const ALLOWED_SYMBOLS = ['TSLA', 'AAPL', 'NVDA', 'MSFT'];
       let allInvestments = [];
       let pricesCache = {};
@@ -794,22 +799,31 @@
       const loginBtnText = document.getElementById('loginBtnText');
       const loginSpinner = document.getElementById('loginSpinner');
 
-      // ----- Admin Login -----
+      // ----- Admin Login (Hardcoded credentials + Server-side auth) -----
       loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         loginError.classList.remove('show');
         loginError.textContent = '';
-        
+
         const username = loginUsername.value.trim();
         const password = loginPassword.value.trim();
-        
+
         if (!username || !password) {
           loginError.textContent = 'Please enter both username and password.';
           loginError.classList.add('show');
           return;
         }
 
-        // Show loading state
+        // ─── FIRST: Validate against hardcoded credentials ───
+        if (username !== ADMIN_CREDENTIALS.username || password !== ADMIN_CREDENTIALS.password) {
+          loginError.textContent = 'Invalid username or password.';
+          loginError.classList.add('show');
+          loginPassword.value = '';
+          loginPassword.focus();
+          return;
+        }
+
+        // ─── SECOND: Authenticate with server ───
         loginBtnText.textContent = 'Signing in...';
         loginSpinner.style.display = 'inline-block';
         loginForm.querySelector('button[type="submit"]').disabled = true;
@@ -822,15 +836,15 @@
             body: JSON.stringify({ username, password })
           });
           const data = await res.json();
-          
+
           if (data.ok) {
             loginShell.classList.add('hidden');
             adminShell.classList.remove('hidden');
+            sessionStorage.setItem('admin_logged_in', 'true');
             showToast('✅ Welcome, Admin!', 'success');
             await loadAdminData();
             await updateTicker();
-            
-            // Start auto-refresh
+
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(async () => {
               if (!adminShell.classList.contains('hidden')) {
@@ -839,7 +853,7 @@
               }
             }, 30000);
           } else {
-            loginError.textContent = data.error || 'Invalid username or password.';
+            loginError.textContent = data.error || 'Server authentication failed.';
             loginError.classList.add('show');
             loginPassword.value = '';
             loginPassword.focus();
@@ -864,13 +878,14 @@
 
       // ----- Logout -----
       document.getElementById('logoutBtn').addEventListener('click', async function() {
-        try { 
-          await fetch('/api/admin/logout', { 
+        try {
+          await fetch('/api/admin/logout', {
             method: 'POST',
             credentials: 'same-origin'
-          }); 
+          });
         } catch (e) {}
-        
+
+        sessionStorage.removeItem('admin_logged_in');
         if (refreshInterval) clearInterval(refreshInterval);
         adminShell.classList.add('hidden');
         loginShell.classList.remove('hidden');
@@ -903,63 +918,58 @@
       async function loadAdminData(retry = true) {
         if (isLoading) return;
         isLoading = true;
-        
+
         const tbody = document.getElementById('adminBody');
         const empty = document.getElementById('adminEmpty');
-        
+
         try {
-          // Show loading state
           tbody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading investments...</td></tr>';
           empty.classList.add('hidden');
           hideError();
-          
-          // Fetch investments with timeout
+
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
-          
+
           const invRes = await fetch('/api/admin/investments', {
             credentials: 'same-origin',
             signal: controller.signal
           });
-          
+
           clearTimeout(timeoutId);
-          
+
           if (invRes.status === 401) {
             showToast('Session expired. Please login again.', 'error');
             adminShell.classList.add('hidden');
             loginShell.classList.remove('hidden');
+            sessionStorage.removeItem('admin_logged_in');
             if (refreshInterval) clearInterval(refreshInterval);
             isLoading = false;
             return;
           }
-          
+
           if (!invRes.ok) {
             const errorText = await invRes.text();
             console.error('Failed to fetch investments:', errorText);
             throw new Error(`Failed to fetch investments: ${invRes.status}`);
           }
-          
+
           const data = await invRes.json();
           allInvestments = data || [];
           console.log('Loaded investments:', allInvestments.length);
-          
-          // Reset retry count on success
+
           retryCount = 0;
-          
-          // Fetch prices
           await fetchPrices();
-          
+
           renderAdminTable(allInvestments, pricesCache);
           updateStats(allInvestments, pricesCache);
-          
+
         } catch (e) {
           console.error('Error loading admin data:', e);
-          
+
           if (e.name === 'AbortError') {
             tbody.innerHTML = `<tr class="error-row"><td colspan="11">⏱️ Request timed out. The server might be starting up.</td></tr>`;
             showError('Request timed out. The server might be starting up.');
-            
-            // Retry after delay
+
             if (retry && retryCount < MAX_RETRIES) {
               retryCount++;
               const delay = 2000 * retryCount;
@@ -988,7 +998,6 @@
         }
       }
 
-      // Expose retry function globally
       window.retryLoadData = function() {
         retryCount = 0;
         hideError();
@@ -998,7 +1007,7 @@
       function renderAdminTable(investments, prices) {
         const tbody = document.getElementById('adminBody');
         const empty = document.getElementById('adminEmpty');
-        
+
         if (!investments || investments.length === 0) {
           tbody.innerHTML = '';
           empty.classList.remove('hidden');
@@ -1057,11 +1066,11 @@
         const uniqueUsers = new Set(investments.map(i => i.user_name)).size;
         let totalInvested = 0;
         let totalValue = 0;
-        
+
         investments.forEach(inv => {
           const costBasis = inv.buy_price * inv.shares;
           totalInvested += costBasis;
-          
+
           const priceInfo = prices[inv.symbol] || { price: null };
           if (priceInfo.price !== null) {
             totalValue += priceInfo.price * inv.shares;
@@ -1069,7 +1078,7 @@
             totalValue += costBasis;
           }
         });
-        
+
         document.getElementById('statTotalRows').textContent = totalRows;
         document.getElementById('statTotalUsers').textContent = uniqueUsers;
         document.getElementById('statTotalInvested').textContent = '$' + totalInvested.toFixed(2);
@@ -1081,12 +1090,12 @@
           const prices = await fetchPrices();
           const track = document.getElementById('tickerTrack');
           let html = '';
-          
+
           if (Object.keys(prices).length === 0) {
             track.innerHTML = '<div class="ticker-item">Loading prices...</div>';
             return;
           }
-          
+
           Object.entries(prices).forEach(([symbol, data]) => {
             const changeClass = data.change_pct >= 0 ? 'change-up' : 'change-down';
             const arrow = data.change_pct >= 0 ? '▲' : '▼';
@@ -1098,7 +1107,7 @@
               </div>
             `;
           });
-          
+
           track.innerHTML = html + html;
         } catch (e) {
           console.error('Error updating ticker:', e);
@@ -1119,7 +1128,6 @@
 
       let currentMode = 'edit';
 
-      // ----- Edit Investment -----
       window.editInvestment = function(id) {
         const inv = allInvestments.find(i => i.id === id);
         if (inv) {
@@ -1130,34 +1138,33 @@
         }
       };
 
-      // ----- Delete Investment -----
       window.deleteInvestment = async function(id) {
         if (!confirm('Delete this investment record?')) return;
-        
+
         try {
-          const res = await fetch(`/api/admin/investments/${id}`, { 
+          const res = await fetch(`/api/admin/investments/${id}`, {
             method: 'DELETE',
             credentials: 'same-origin'
           });
-          
+
           if (res.status === 401) {
             showToast('Session expired. Please login again.', 'error');
             adminShell.classList.add('hidden');
             loginShell.classList.remove('hidden');
+            sessionStorage.removeItem('admin_logged_in');
             if (refreshInterval) clearInterval(refreshInterval);
             return;
           }
-          
+
           if (!res.ok) {
             const err = await res.json();
             throw new Error(err.error || 'Delete failed');
           }
-          
+
           showToast('Investment deleted.', 'success');
           await loadAdminData();
           await updateTicker();
-          
-          // Notify dashboard
+
           if (window.opener && !window.opener.closed) {
             try {
               window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
@@ -1169,19 +1176,14 @@
         }
       };
 
-      // ----- Copy Investment -----
       window.copyInvestment = function(id) {
         const inv = allInvestments.find(i => i.id === id);
         if (inv) {
-          const copy = { 
-            ...inv, 
-            id: null
-          };
+          const copy = { ...inv, id: null };
           openEditModal(copy, 'create');
         }
       };
 
-      // ----- Open Edit Modal -----
       function openEditModal(inv, mode = 'edit') {
         currentMode = mode;
         if (mode === 'create') {
@@ -1207,20 +1209,20 @@
       }
 
       cancelEdit.addEventListener('click', () => editOverlay.classList.add('hidden'));
-      editOverlay.addEventListener('click', (e) => { 
-        if (e.target === editOverlay) editOverlay.classList.add('hidden'); 
+      editOverlay.addEventListener('click', (e) => {
+        if (e.target === editOverlay) editOverlay.classList.add('hidden');
       });
 
       // ----- Submit Edit Form -----
       document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const symbol = editSymbol.value;
         if (!ALLOWED_SYMBOLS.includes(symbol)) {
           showToast('Only TSLA, AAPL, NVDA, MSFT are allowed.', 'error');
           return;
         }
-        
+
         const payload = {
           user_name: editUserName.value.trim(),
           email: editEmail.value.trim(),
@@ -1246,11 +1248,11 @@
             method = 'POST';
           } else {
             const id = parseInt(editId.value);
-            if (!id || isNaN(id)) { 
-              showToast('Invalid record ID.', 'error'); 
+            if (!id || isNaN(id)) {
+              showToast('Invalid record ID.', 'error');
               submitBtn.disabled = false;
               submitBtn.textContent = originalText;
-              return; 
+              return;
             }
             url = `/api/admin/investments/${id}`;
             method = 'PUT';
@@ -1262,17 +1264,18 @@
             credentials: 'same-origin',
             body: JSON.stringify(payload)
           });
-          
+
           if (res.status === 401) {
             showToast('Session expired. Please login again.', 'error');
             adminShell.classList.add('hidden');
             loginShell.classList.remove('hidden');
+            sessionStorage.removeItem('admin_logged_in');
             if (refreshInterval) clearInterval(refreshInterval);
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
             return;
           }
-          
+
           const responseText = await res.text();
           let responseData;
           try {
@@ -1280,18 +1283,17 @@
           } catch (parseError) {
             throw new Error('Server returned invalid response.');
           }
-          
+
           if (!res.ok) {
             throw new Error(responseData.error || 'Operation failed');
           }
-          
+
           editOverlay.classList.add('hidden');
           showToast(currentMode === 'create' ? '✅ Investment created!' : '✅ Investment updated!', 'success');
-          
+
           await loadAdminData();
           await updateTicker();
-          
-          // Notify dashboard
+
           if (window.opener && !window.opener.closed) {
             try {
               window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
@@ -1310,20 +1312,20 @@
       document.getElementById('resetDbBtn').addEventListener('click', async function() {
         if (!confirm('⚠️ This will delete ALL investment data and reset the database. Are you sure?')) return;
         if (!confirm('⚠️⚠️ This action cannot be undone! All investments will be permanently deleted. Continue?')) return;
-        
+
         try {
           const btn = this;
           const originalText = btn.textContent;
           btn.disabled = true;
           btn.textContent = 'Resetting...';
-          
+
           const res = await fetch('/api/admin/reset-db', {
             method: 'POST',
             credentials: 'same-origin'
           });
-          
+
           const data = await res.json();
-          
+
           if (res.ok) {
             showToast('✅ Database reset successfully!', 'success');
             await loadAdminData();
@@ -1331,7 +1333,7 @@
           } else {
             throw new Error(data.error || 'Failed to reset database');
           }
-          
+
           btn.disabled = false;
           btn.textContent = originalText;
         } catch (e) {
@@ -1363,10 +1365,38 @@
         return div.innerHTML;
       }
 
-      // ----- Init - Always show login form first -----
-      // The login shell is visible by default, admin shell is hidden
-      // No auto-check for admin session - user must login manually
-      console.log('Admin page loaded - please login');
+      // ----- Check for existing admin session (via sessionStorage) -----
+      if (sessionStorage.getItem('admin_logged_in') === 'true') {
+        // Verify session is still valid with server
+        fetch('/api/admin/investments', { credentials: 'same-origin' })
+          .then(res => {
+            if (res.status === 401) {
+              sessionStorage.removeItem('admin_logged_in');
+              loginShell.classList.remove('hidden');
+              adminShell.classList.add('hidden');
+              showToast('Session expired. Please login again.', 'error');
+            } else {
+              loginShell.classList.add('hidden');
+              adminShell.classList.remove('hidden');
+              loadAdminData();
+              updateTicker();
+              if (refreshInterval) clearInterval(refreshInterval);
+              refreshInterval = setInterval(async () => {
+                if (!adminShell.classList.contains('hidden')) {
+                  await loadAdminData(false);
+                  await updateTicker();
+                }
+              }, 30000);
+            }
+          })
+          .catch(() => {
+            // If server check fails, still show login
+            loginShell.classList.remove('hidden');
+            adminShell.classList.add('hidden');
+          });
+      }
+
+      console.log('Admin page loaded - hardcoded credentials: admin / admin123');
     })();
   </script>
 </body>
