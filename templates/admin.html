@@ -302,7 +302,6 @@
       margin-top: 0.15rem;
     }
 
-    /* Error banner */
     .error-banner {
       background: #fef2f2;
       border: 1px solid #fecaca;
@@ -552,7 +551,7 @@
 <body>
   <div class="toast" id="toast"></div>
 
-  <!-- LOGIN - Always shown first -->
+  <!-- LOGIN -->
   <div class="login-shell" id="loginShell">
     <div class="login-card">
       <div class="mark">
@@ -564,11 +563,11 @@
       <form id="loginForm">
         <div class="field">
           <label for="loginUsername">Username</label>
-          <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" required />
+          <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" value="admin" required />
         </div>
         <div class="field">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" value="admin123" required />
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">
           <span id="loginBtnText">Sign in</span>
@@ -576,12 +575,12 @@
         </button>
       </form>
       <div style="margin-top:1rem;text-align:center;font-size:0.7rem;color:#94a3b8;">
-        <a href="/" style="color:#2563eb;text-decoration:none;">← Back to homepage</a>
+        <span style="color:#2563eb;">Username: admin | Password: admin123</span>
       </div>
     </div>
   </div>
 
-  <!-- ADMIN SHELL - Only shown after successful admin login -->
+  <!-- ADMIN SHELL -->
   <div class="hidden" id="adminShell">
     <div class="admin-wrapper">
       <div class="ticker-tape">
@@ -627,7 +626,6 @@
             </div>
           </div>
 
-          <!-- Error banner -->
           <div class="error-banner" id="errorBanner">
             <span id="errorMessage">⚠️ Failed to load data</span>
             <button class="retry-btn" id="retryBtn">🔄 Retry</button>
@@ -692,7 +690,7 @@
     </div>
   </div>
 
-  <!-- MODAL (create / edit) -->
+  <!-- MODAL -->
   <div class="modal-overlay hidden" id="editModalOverlay">
     <div class="modal">
       <h3 id="modalTitle">
@@ -751,7 +749,7 @@
 
   <script>
     (function() {
-      // ─── HARDCODED ADMIN CREDENTIALS (matches server) ───
+      // ─── ADMIN CREDENTIALS (matches backend) ───
       const ADMIN_CREDENTIALS = {
         username: 'admin',
         password: 'admin123'
@@ -761,8 +759,6 @@
       let allInvestments = [];
       let pricesCache = {};
       let isLoading = false;
-      let retryCount = 0;
-      const MAX_RETRIES = 3;
       let refreshInterval = null;
 
       // ----- Toast -----
@@ -799,7 +795,21 @@
       const loginBtnText = document.getElementById('loginBtnText');
       const loginSpinner = document.getElementById('loginSpinner');
 
-      // ----- Admin Login (Server-side auth) -----      loginForm.addEventListener('submit', async function(e) {
+      // ----- API Helpers -----
+      async function apiFetch(url, options = {}) {
+        const response = await fetch(url, {
+          ...options,
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+          }
+        });
+        return response;
+      }
+
+      // ----- Admin Login (Backend) -----
+      loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         loginError.classList.remove('show');
         loginError.textContent = '';
@@ -813,16 +823,13 @@
           return;
         }
 
-        // Show loading state
         loginBtnText.textContent = 'Signing in...';
         loginSpinner.style.display = 'inline-block';
         loginForm.querySelector('button[type="submit"]').disabled = true;
 
         try {
-          const res = await fetch('/api/admin/login', {
+          const res = await apiFetch('/api/admin/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
             body: JSON.stringify({ username, password })
           });
           const data = await res.json();
@@ -850,7 +857,7 @@
           }
         } catch (e) {
           console.error('Login error:', e);
-          loginError.textContent = 'Network error. Please try again.';
+          loginError.textContent = 'Network error. Please make sure the server is running.';
           loginError.classList.add('show');
         } finally {
           loginBtnText.textContent = 'Sign in';
@@ -859,7 +866,6 @@
         }
       });
 
-      // Allow Enter key to submit
       loginPassword.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           loginForm.dispatchEvent(new Event('submit'));
@@ -869,10 +875,7 @@
       // ----- Logout -----
       document.getElementById('logoutBtn').addEventListener('click', async function() {
         try {
-          await fetch('/api/admin/logout', {
-            method: 'POST',
-            credentials: 'same-origin'
-          });
+          await apiFetch('/api/admin/logout', { method: 'POST' });
         } catch (e) {}
 
         sessionStorage.removeItem('admin_logged_in');
@@ -885,17 +888,16 @@
 
       // ----- Retry button -----
       document.getElementById('retryBtn').addEventListener('click', function() {
-        retryCount = 0;
         hideError();
         loadAdminData(true);
         showToast('🔄 Retrying...', 'success');
       });
 
-      // ----- Data Loading with Retry -----
+      // ----- Data Loading -----
       async function fetchPrices() {
         try {
-          const res = await fetch('/api/prices', { credentials: 'same-origin' });
-          if (!res.ok) throw new Error('Failed to fetch prices: ' + res.status);
+          const res = await apiFetch('/api/prices');
+          if (!res.ok) throw new Error('Failed to fetch prices');
           const data = await res.json();
           pricesCache = data.prices || {};
           return pricesCache;
@@ -905,7 +907,7 @@
         }
       }
 
-      async function loadAdminData(retry = true) {
+      async function loadAdminData(showLoading = true) {
         if (isLoading) return;
         isLoading = true;
 
@@ -913,19 +915,13 @@
         const empty = document.getElementById('adminEmpty');
 
         try {
-          tbody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading investments...</td></tr>';
+          if (showLoading) {
+            tbody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading investments...</td></tr>';
+          }
           empty.classList.add('hidden');
           hideError();
 
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-          const invRes = await fetch('/api/admin/investments', {
-            credentials: 'same-origin',
-            signal: controller.signal
-          });
-
-          clearTimeout(timeoutId);
+          const invRes = await apiFetch('/api/admin/investments');
 
           if (invRes.status === 401) {
             showToast('Session expired. Please login again.', 'error');
@@ -938,8 +934,6 @@
           }
 
           if (!invRes.ok) {
-            const errorText = await invRes.text();
-            console.error('Failed to fetch investments:', errorText);
             throw new Error(`Failed to fetch investments: ${invRes.status}`);
           }
 
@@ -947,49 +941,29 @@
           allInvestments = data || [];
           console.log('Loaded investments:', allInvestments.length);
 
-          retryCount = 0;
           await fetchPrices();
-
           renderAdminTable(allInvestments, pricesCache);
           updateStats(allInvestments, pricesCache);
 
         } catch (e) {
           console.error('Error loading admin data:', e);
-
-          if (e.name === 'AbortError') {
-            tbody.innerHTML = `<tr class="error-row"><td colspan="11">⏱️ Request timed out. The server might be starting up.</td></tr>`;
-            showError('Request timed out. The server might be starting up.');
-
-            if (retry && retryCount < MAX_RETRIES) {
-              retryCount++;
-              const delay = 2000 * retryCount;
-              showToast(`⏱️ Retrying in ${delay/1000}s... (attempt ${retryCount}/${MAX_RETRIES})`, 'error');
-              setTimeout(() => {
-                loadAdminData(true);
-              }, delay);
-            } else if (retryCount >= MAX_RETRIES) {
-              showError('Max retries reached. Please click Retry or Refresh.');
-            }
-          } else {
-            tbody.innerHTML = `
-              <tr class="error-row">
-                <td colspan="11">
-                  ❌ Error loading data: ${e.message}
-                  <br>
-                  <button class="retry-btn" onclick="window.retryLoadData()">🔄 Retry</button>
-                </td>
-              </tr>
-            `;
-            showError(e.message || 'Failed to load data');
-            showToast('❌ Failed to load data. Click Retry or Refresh.', 'error');
-          }
+          tbody.innerHTML = `
+            <tr class="error-row">
+              <td colspan="11">
+                ❌ Error loading data: ${e.message}
+                <br>
+                <button class="retry-btn" onclick="window.retryLoadData()">🔄 Retry</button>
+              </td>
+            </tr>
+          `;
+          showError(e.message || 'Failed to load data');
+          showToast('❌ Failed to load data. Click Retry or Refresh.', 'error');
         } finally {
           isLoading = false;
         }
       }
 
       window.retryLoadData = function() {
-        retryCount = 0;
         hideError();
         loadAdminData(true);
       };
@@ -1132,9 +1106,8 @@
         if (!confirm('Delete this investment record?')) return;
 
         try {
-          const res = await fetch(`/api/admin/investments/${id}`, {
-            method: 'DELETE',
-            credentials: 'same-origin'
+          const res = await apiFetch(`/api/admin/investments/${id}`, {
+            method: 'DELETE'
           });
 
           if (res.status === 401) {
@@ -1154,12 +1127,6 @@
           showToast('Investment deleted.', 'success');
           await loadAdminData();
           await updateTicker();
-
-          if (window.opener && !window.opener.closed) {
-            try {
-              window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
-            } catch (e) {}
-          }
         } catch (e) {
           console.error('Delete error:', e);
           showToast(e.message || 'Error deleting.', 'error');
@@ -1248,10 +1215,8 @@
             method = 'PUT';
           }
 
-          const res = await fetch(url, {
+          const res = await apiFetch(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
             body: JSON.stringify(payload)
           });
 
@@ -1283,12 +1248,6 @@
 
           await loadAdminData();
           await updateTicker();
-
-          if (window.opener && !window.opener.closed) {
-            try {
-              window.opener.postMessage({ type: 'REFRESH_DASHBOARD' }, '*');
-            } catch (e) {}
-          }
         } catch (e) {
           console.error('Error saving investment:', e);
           showToast('❌ ' + (e.message || 'Error saving investment.'), 'error');
@@ -1309,9 +1268,8 @@
           btn.disabled = true;
           btn.textContent = 'Resetting...';
 
-          const res = await fetch('/api/admin/reset-db', {
-            method: 'POST',
-            credentials: 'same-origin'
+          const res = await apiFetch('/api/admin/reset-db', {
+            method: 'POST'
           });
 
           const data = await res.json();
@@ -1340,7 +1298,6 @@
 
       // ----- Refresh -----
       document.getElementById('refreshBtn').addEventListener('click', async function() {
-        retryCount = 0;
         hideError();
         await loadAdminData();
         await updateTicker();
@@ -1355,38 +1312,37 @@
         return div.innerHTML;
       }
 
-      // ----- Check for existing admin session (via sessionStorage) -----
-      // Verify session is still valid with server
-      if (sessionStorage.getItem('admin_logged_in') === 'true') {
-        fetch('/api/admin/investments', { credentials: 'same-origin' })
-          .then(res => {
-            if (res.status === 401) {
-              sessionStorage.removeItem('admin_logged_in');
-              loginShell.classList.remove('hidden');
-              adminShell.classList.add('hidden');
-              showToast('Session expired. Please login again.', 'error');
-            } else {
-              loginShell.classList.add('hidden');
-              adminShell.classList.remove('hidden');
-              loadAdminData();
-              updateTicker();
-              if (refreshInterval) clearInterval(refreshInterval);
-              refreshInterval = setInterval(async () => {
-                if (!adminShell.classList.contains('hidden')) {
-                  await loadAdminData(false);
-                  await updateTicker();
-                }
-              }, 30000);
-            }
-          })
-          .catch(() => {
-            // If server check fails, show login
-            loginShell.classList.remove('hidden');
-            adminShell.classList.add('hidden');
-          });
+      // ----- Check for existing admin session -----
+      async function checkSession() {
+        try {
+          const res = await apiFetch('/api/admin/session');
+          const data = await res.json();
+          if (data.is_admin) {
+            loginShell.classList.add('hidden');
+            adminShell.classList.remove('hidden');
+            sessionStorage.setItem('admin_logged_in', 'true');
+            await loadAdminData();
+            await updateTicker();
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(async () => {
+              if (!adminShell.classList.contains('hidden')) {
+                await loadAdminData(false);
+                await updateTicker();
+              }
+            }, 30000);
+          } else {
+            sessionStorage.removeItem('admin_logged_in');
+          }
+        } catch (e) {
+          console.log('Session check failed:', e);
+        }
       }
 
-      console.log('Admin page loaded - use admin / admin123');
+      if (sessionStorage.getItem('admin_logged_in') === 'true') {
+        checkSession();
+      }
+
+      console.log('✅ Admin page loaded - use admin / admin123');
     })();
   </script>
 </body>
